@@ -1,4 +1,3 @@
 ![Logo OhMyWindows](logo.png)
-
-# OhMyWindows
+# A Windows 11 post-setup batch script with personal .dotfile
  
