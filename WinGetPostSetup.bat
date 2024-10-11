@@ -108,14 +108,16 @@ echo.
 echo 1 - Installer la présélection de programmes
 echo 2 - Sélectionner des programmes
 echo 3 - Appliquer les paramètres Windows
-echo 4 - Quitter
+echo 4 - Installer Microsoft Store
+echo 5 - Quitter
 echo.
 set /p choix=Sélectionner une option : 
 
 if %choix%==1 goto :install_preselection
 if %choix%==2 goto :install_programmes
 if %choix%==3 goto :apply_windows_settings
-if %choix%==4 goto :end_of_script
+if %choix%==4 goto :install_microsoft_store
+if %choix%==5 goto :end_of_script
 
 :install_preselection
 if not exist "%~dp0packages-winget.json" (
@@ -286,7 +288,59 @@ pause >nul
 
 taskkill /F /IM explorer.exe
 start explorer.exe
-goto :end_of_script
+goto :winget_installed
+
+:install_microsoft_store
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Microsoft Store
+echo.
+
+:: Vérifier la version de Windows
+for /f "tokens=6 delims=[]. " %%G in ('ver') do if %%G lss 16299 (
+    echo Erreur : Windows 11 24H2 (version 26100 ou ultérieure) requis.
+    echo.
+    echo Appuyez sur une touche pour revenir au menu principal...
+    pause >nul
+    goto :winget_installed
+)
+
+:: Créer un dossier temporaire pour les fichiers
+set "tempFolder=%TEMP%\MicrosoftStoreInstall"
+mkdir "%tempFolder%" 2>nul
+
+:: Télécharger les fichiers nécessaires
+echo Téléchargement des fichiers nécessaires...
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml' -OutFile '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_12.2401.20001.0_neutral___8wekyb3d8bbwe.msixbundle' -OutFile '%tempFolder%\WindowsStore.msixbundle' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.2.2_2.2.29512.0_x64__8wekyb3d8bbwe.appx' -OutFile '%tempFolder%\Framework6X64.appx' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.2.2_2.2.28604.0_x64__8wekyb3d8bbwe.appx' -OutFile '%tempFolder%\Runtime6X64.appx' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_12401.20001.0.0_neutral___8wekyb3d8bbwe.msixbundle' -OutFile '%tempFolder%\StorePurchaseApp.msixbundle' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml' -OutFile '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_12.95.3001.0_neutral___8wekyb3d8bbwe.msixbundle' -OutFile '%tempFolder%\XboxIdentityProvider.msixbundle' }"
+powershell -Command "& { $ProgressPreference = 'SilentlyContinue'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml' -OutFile '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml' }"
+
+:: Installer Microsoft Store et ses dépendances
+echo Installation de Microsoft Store et ses composants...
+powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml'"
+powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx'"
+powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx'"
+powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle'"
+powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.msixbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml'"
+powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.msixbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml'"
+
+:: Nettoyer les fichiers temporaires
+rmdir /s /q "%tempFolder%"
+
+echo.
+echo Microsoft Store et ses composants ont été installés avec succès.
+echo.
+echo Appuyez sur une touche pour revenir au menu principal...
+pause >nul
+goto :winget_installed
 
 :end_of_script
 cls
