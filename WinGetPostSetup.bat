@@ -118,6 +118,9 @@ if %choix%==3 goto :apply_windows_settings
 if %choix%==4 goto :end_of_script
 
 :install_preselection
+if not exist "%~dp0packages-winget.json" (
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/packages-winget.json' -OutFile '%~dp0packages-winget.json'"
+)
 winget import packages-winget.json --accept-source-agreements --accept-package-agreements
 goto :winget_installed
 
@@ -129,6 +132,10 @@ echo %ligne3%
 echo.
 echo ■ Sélection des programmes à installer
 echo.
+
+if not exist "%~dp0packages.txt" (
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/packages.txt' -OutFile '%~dp0packages.txt'"
+)
 
 set "counter=1"
 for /f "tokens=1,2 delims=|" %%a in (packages.txt) do (
@@ -187,7 +194,13 @@ if exist "%~dp0Blank.ico" (
     copy "%~dp0Blank.ico" "C:\Windows\Blank.ico" /Y
     set "shellIconValue=%%SystemRoot%%\Blank.ico,0"
 ) else (
-    set "shellIconValue=%%windir%%\System32\imageres.dll,-17"
+    :: Télécharger Blank.ico s'il n'existe pas
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
+    if exist "C:\Windows\Blank.ico" (
+        set "shellIconValue=%%SystemRoot%%\Blank.ico,0"
+    ) else (
+        set "shellIconValue=%%windir%%\System32\imageres.dll,-17"
+    )
 )
 
 :: Créer le fichier .reg
