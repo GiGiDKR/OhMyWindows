@@ -28,4 +28,4 @@ Windows Calculator|9WZDNCRFHVN5
 Windows Notepad|9MSMLRH6LZF3
 Windows Terminal|Microsoft.WindowsTerminal
 Windhawk|RamenSoftware.Windhawk
-WinDirStat|WinDirStat.WinDirStat
+WizTree|AntibodySoftware.WizTree 
