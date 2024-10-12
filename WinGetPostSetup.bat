@@ -25,9 +25,23 @@ if %errorLevel% == 0 (
 )
 
 :admin_ok
+powershell -Command "& {$policy = Get-ExecutionPolicy; if ($policy -eq 'Restricted') {Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; Write-Host 'Modified'} else {Write-Host 'OK'}}" > "%TEMP%\policy_check.txt" 2>nul
+set /p policy_status=<"%TEMP%\policy_check.txt"
+del "%TEMP%\policy_check.txt" >nul 2>&1
+
+if "%policy_status%"=="Modified" (
+    echo Politique d'exécution PowerShell modifiée
+    echo.
+) else (
+
+    echo Politique d'exécution PowerShell correctement configurée
+    echo.
+)
+
 :: Définir la taille de la fenêtre
 :: mode con: cols=80 lines=30
 
+cls
 echo %ligne1%
 echo %ligne2%
 echo %ligne3%
@@ -38,24 +52,13 @@ where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
     echo ► Version de Winget : %winget_version%
-    exit /b 0
+    goto :winget_installed
 ) else (
-    echo x Winget n'est pas installé sur votre système.
+    echo x Winget n'est pas installé sur votre système
     exit /b 1
 )
 
-powershell -Command "& {$policy = Get-ExecutionPolicy; if ($policy -eq 'Restricted') {Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force; Write-Host 'Modified'} else {Write-Host 'OK'}}" > "%TEMP%\policy_check.txt" 2>nul
-set /p policy_status=<"%TEMP%\policy_check.txt"
-del "%TEMP%\policy_check.txt" >nul 2>&1
-
-if "%policy_status%"=="Modified" (
-    echo Politique d'exécution PowerShell modifiée.
-    echo.
-) else (
-
-    echo Politique d'exécution PowerShell correctement configurée.
-    echo.
-)
+call :version_winget
 
 cls
 echo %ligne1%
@@ -183,19 +186,20 @@ for %%i in (%choix%) do (
         echo - Installation de !name!
         winget install !id! --silent --accept-source-agreements --accept-package-agreements
         if !errorlevel! equ 0 (
+            echo.
             echo ► Installation de !name! réussie.
         ) else (
+            echo.
             echo x Échec de l'installation de !name!.
         )
     ) else (
+        echo.
         echo x Le programme numéro %%i n'existe pas dans la liste.
     )
 )
 
 echo.
-echo ► Toutes les installations sont terminées.
-echo.
-echo Appuyez sur une touche pour revenir au menu
+echo Appuyez sur une touche pour continuer
 pause >nul
 goto :install_programmes
 
@@ -207,7 +211,7 @@ echo %ligne3%
 echo.
 echo ■ Application des paramètres Windows
 echo.
-echo - Les paramètres Windows seront appliqués après le redémarrage de l'explorateur.
+echo - Redémarrage de l'explorateur nécessaire
 echo.
 echo Appuyez sur une touche pour continuer
 pause >nul
@@ -309,36 +313,45 @@ echo.
 echo ■ Installation de Microsoft Store
 echo.
 
-set "tempFolder=%TEMP%\MicrosoftStoreInstall"
-mkdir "%tempFolder%" 2>nul
+powershell -Command "Get-AppxPackage Microsoft.StoreApp -ErrorAction SilentlyContinue" >nul 2>&1
+if %errorlevel% equ 0 (
+    echo x Microsoft Store est déjà installé
+    echo.
+    echo Appuyez sur une touche pour revenir au menu principal
+    pause >nul
+    goto :winget_installed
+) else (
+    set "tempFolder=%TEMP%\MicrosoftStoreInstall"
+    mkdir "%tempFolder%" 2>nul
 
-echo - Téléchargement des fichiers nécessaires
-start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
-    https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
+    echo - Téléchargement des fichiers nécessaires
+    start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
 
-echo - Installation de Microsoft Store et ses composants
-powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml'"
-powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx'"
-powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx'"
-powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle'"
-powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.appxbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml'"
-powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.appxbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml'"
+    echo - Installation de Microsoft Store et ses composants
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml'"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx'"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx'"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle'"
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.appxbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml'"
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.appxbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml'"
 
-rmdir /s /q "%tempFolder%"
+    rmdir /s /q "%tempFolder%"
 
-echo.
-echo Microsoft Store et ses composants ont été installés avec succès.
-echo.
-echo Appuyez sur une touche pour revenir au menu principal...
-pause >nul
-goto :winget_installed
+    echo.
+    echo Microsoft Store et ses composants ont été installés avec succès
+    echo.
+    echo Appuyez sur une touche pour revenir au menu principal
+    pause >nul
+    goto :winget_installed
+)
 
 :end_of_script
 cls
