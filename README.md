@@ -1,6 +1,6 @@
 ![Logo OhMyWindows](logo.png)
 
-# Windows 11 post-setup batch script with .dotfile  config <sup> *(WIP)* </sup>
+# Windows 11 post-setup script with .dotfile config <sup> *(WIP)* </sup>
 
 ## Features
 > [!NOTE]
