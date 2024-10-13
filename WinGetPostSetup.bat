@@ -2,9 +2,17 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-set "ligne1========================================"
-set "ligne2=              OhMyWindows              "
-set "ligne3========================================"
+if "%WT_SESSION%"=="" (
+    where wt >nul 2>&1
+    if %errorlevel% equ 0 (
+        start wt "%~dpnx0"
+        exit /b
+    )
+)
+
+set "ligne1============================================"
+set "ligne2=               OhMyWindows                 "
+set "ligne3============================================"
 
 :: Sauvegarder le chemin d'origine
 if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%~dp0"
@@ -52,7 +60,7 @@ where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
     echo ► Version de Winget : %winget_version%
-    goto :winget_installed
+    goto :main menu
 ) else (
     echo x Winget n'est pas installé sur votre système
     exit /b 1
@@ -100,51 +108,131 @@ call :version_winget
 echo.
 echo Appuyez sur une touche pour continuer
 pause >nul
-goto :winget_installed
+goto :main menu
 
-:winget_installed
+:main menu
 cls
 echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.  
-echo ■ Installation des programmes
+echo ■ Menu principal
 echo.
 
-echo 1 - Installer la présélection de programmes
-echo 2 - Sélectionner des programmes
-echo 3 - Installer Microsoft Store
-echo 4 - Activer Windows
-echo 5 - Exécuter WinUtil
-echo 6 - Appliquer les paramètres Windows
+echo 1 - Installation de programmes
+echo 2 - Installation de Microsoft Store
+echo 3 - Fonctionnalités Windows
+echo 4 - Activation de Windows
+echo 5 - Exécution de WinUtil
+echo 6 - Application des paramètres Windows
 echo.
 echo 7 - Quitter
 echo.
-set /p choix=Sélectionner une option : 
+echo %ligne1%
+echo.
+set /p choix=■ Sélectionner une option : 
 
-if "%choix%"=="1" goto :install_preselection
-if "%choix%"=="2" goto :install_programmes
-if "%choix%"=="3" goto :install_microsoft_store
+if "%choix%"=="1" goto :install_programmes
+if "%choix%"=="2" goto :install_microsoft_store
+if "%choix%"=="3" goto :windows_features
 if "%choix%"=="4" goto :activate_windows
 if "%choix%"=="5" goto :run_winutil
 if "%choix%"=="6" goto :apply_windows_settings
 if "%choix%"=="7" goto :end_of_script
 
+:windows_features
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo �  Fonctionnalités Windows
+echo.
+echo 1 - Hyper-V
+echo 2 - Sandbox
+echo 3 - .NET Framework 3.5
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p feature_choice=�  Sélectionner une option : 
+
+if "%feature_choice%"=="0" goto :main menu
+if "%feature_choice%"=="1" goto :enable_hyperv
+if "%feature_choice%"=="2" goto :enable_sandbox
+if "%feature_choice%"=="3" goto :enable_dotnet35
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :windows_features
+
+:enable_hyperv
+echo.
+echo Installation de Hyper-V...
+DISM /Online /Enable-Feature /All /FeatureName:Microsoft-Hyper-V /NoRestart
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Hyper-V a été installé avec succès.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+) else if %errorlevel% equ 3010 (
+    echo.
+    echo ► Hyper-V a été installé avec succès.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+) else (
+    echo.
+    echo x Échec de l'installation de Hyper-V.
+)
+echo.
+pause
+goto :windows_features
+
+:enable_sandbox
+echo.
+echo Installation de Windows Sandbox...
+DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Windows Sandbox a été installé avec succès.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+) else if %errorlevel% equ 3010 (
+    echo.
+    echo ► Windows Sandbox a été installé avec succès.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+) else (
+    echo.
+    echo x Échec de l'installation de Windows Sandbox.
+)
+echo.
+pause
+goto :windows_features
+
+:enable_dotnet35
+echo.
+echo Installation de .NET Framework 3.5...
+DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
+if %errorlevel% equ 0 (
+    echo.
+    echo ► .NET Framework 3.5 a été installé avec succès.
+    echo Un redémarrage peut être nécessaire pour finaliser l'installation.
+) else if %errorlevel% equ 3010 (
+    echo.
+    echo ► .NET Framework 3.5 a été installé avec succès.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+) else (
+    echo.
+    echo x Échec de l'installation de .NET Framework 3.5.
+)
+echo.
+pause
+goto :windows_features
+
 :activate_windows
 powershell -Command "irm https://get.activated.win | iex"
-goto :winget_installed
+goto :main menu
 
 :run_winutil
 powershell -Command "irm https://christitus.com/win | iex"
-goto :winget_installed
-
-:install_preselection
-if not exist "%ORIGINAL_PATH%packages-winget.json" (
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/packages-winget.json' -OutFile '%ORIGINAL_PATH%packages-winget.json'"
-)
-echo.
-winget import "%ORIGINAL_PATH%packages-winget.json" --accept-source-agreements --accept-package-agreements
-goto :winget_installed
+goto :main menu
 
 :install_programmes
 cls
@@ -156,7 +244,7 @@ echo ■ Sélection des programmes à installer
 echo.
 
 if not exist "%ORIGINAL_PATH%packages.txt" (
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.1.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
 )
 
 set "counter=1"
@@ -166,15 +254,20 @@ for /f "tokens=1,2 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
     set /a "counter+=1"
 )
 
-set /a "total_programs=counter - 1"
-echo.
-echo Nombre total de programmes trouvés : %total_programs%
-echo.
-echo 0 - Retour au menu précédent
-echo.
-set /p choix=Saisir les numéros des programmes (séparés par des espaces) : 
+set "program[!counter!]=Cleanmgr+|CUSTOM"
+echo !counter! - Cleanmgr+
 
-if "%choix%"=="0" goto :winget_installed
+set /a "total_programs=counter"
+echo.
+echo 0 - Retour au menu principal
+echo A - Installer tous les programmes
+echo.
+echo %ligne1%
+echo.
+set /p choix=■ Saisir les numéros (séparés par des espaces) : 
+
+if "%choix%"=="0" goto :main menu
+if /i "%choix%"=="A" goto :install_all_programs
 
 for %%i in (%choix%) do (
     if defined program[%%i] (
@@ -182,15 +275,38 @@ for %%i in (%choix%) do (
             set "name=%%a"
             set "id=%%b"
         )
-        echo.
-        echo - Installation de !name!
-        winget install !id! --silent --accept-source-agreements --accept-package-agreements
-        if !errorlevel! equ 0 (
-            echo.
-            echo ► Installation de !name! réussie.
+        if "!id!"=="CUSTOM" (
+            if "!name!"=="Cleanmgr+" (
+                cls
+                echo %ligne1%
+                echo %ligne2%
+                echo %ligne3%
+                echo.
+                echo � Installation de Cleanmgr+
+                powershell -Command "& {$tempFile = [System.IO.Path]::GetTempFileName() + '.zip'; Invoke-WebRequest -Uri 'https://github.com/builtbybel/CleanmgrPlus/releases/download/1.50.1300/cleanmgrplus.zip' -OutFile $tempFile -ErrorAction SilentlyContinue | Out-Null; New-Item -ItemType Directory -Path 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; Expand-Archive -Path $tempFile -DestinationPath 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', 'Cleanmgr+.lnk')); $Shortcut.TargetPath = 'C:\Program Files\Cleanmgr+\Cleanmgr+.exe'; $Shortcut.Save(); $Shell = New-Object -ComObject Shell.Application; $Folder = $Shell.Namespace('C:\Program Files\Cleanmgr+'); $Item = $Folder.ParseName('Cleanmgr+.exe'); if ($Item) { $Item.InvokeVerb('pin to start') }; Remove-Item $tempFile -Force -ErrorAction SilentlyContinue | Out-Null}" 2>nul
+                if !errorlevel! equ 0 (
+                    echo.
+                    echo ► Installation de Cleanmgr+ réussie
+                ) else (
+                    echo.
+                    echo x Échec de l'installation de Cleanmgr+
+                )
+            )
         ) else (
+            cls
+            echo %ligne1%
+            echo %ligne2%
+            echo %ligne3%
             echo.
-            echo x Échec de l'installation de !name!.
+            echo � Installation de !name!
+            winget install !id! --silent --accept-source-agreements --accept-package-agreements
+            if !errorlevel! equ 0 (
+                echo.
+                echo ► Installation de !name! réussie
+            ) else (
+                echo.
+                echo x Échec de l'installation de !name!
+            )
         )
     ) else (
         echo.
@@ -202,6 +318,38 @@ echo.
 echo Appuyez sur une touche pour continuer
 pause >nul
 goto :install_programmes
+
+:install_all_programs
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo � Installation de tous les programmes
+for /f "tokens=1,2 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
+    echo.
+    echo - Installation de %%a
+    winget install %%b --silent --accept-source-agreements --accept-package-agreements
+    if !errorlevel! equ 0 (
+        echo ► Installation de %%a réussie
+    ) else (
+        echo x Échec de l'installation de %%a
+    )
+)
+
+echo.
+echo - Installation de Cleanmgr+
+powershell -Command "Invoke-WebRequest -Uri 'https://github.com/builtbybel/CleanmgrPlus/releases/download/1.50.1300/cleanmgrplus.zip' -OutFile '$env:TEMP\cleanmgrplus.zip' -ErrorAction SilentlyContinue | Out-Null; New-Item -ItemType Directory -Path 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; Expand-Archive -Path '$env:TEMP\cleanmgrplus.zip' -DestinationPath 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('$env:USERPROFILE\Desktop\Cleanmgr+.lnk'); $Shortcut.TargetPath = 'C:\Program Files\Cleanmgr+\Cleanmgr+.exe'; $Shortcut.Save(); $Shell = New-Object -ComObject Shell.Application; $Folder = $Shell.Namespace('C:\Program Files\Cleanmgr+'); $Item = $Folder.ParseName('Cleanmgr+.exe'); $Item.InvokeVerb('pin to start'); Remove-Item '$env:TEMP\cleanmgrplus.zip' -Force -ErrorAction SilentlyContinue | Out-Null"
+if !errorlevel! equ 0 (
+    echo ► Installation de Cleanmgr+ réussie
+) else (
+    echo x Échec de l'installation de Cleanmgr+
+)
+
+echo.
+echo Appuyez sur une touche pour continuer
+pause >nul
+goto :main menu
 
 :apply_windows_settings
 cls
@@ -220,7 +368,7 @@ if not exist "C:\Windows\Blank.ico" (
     if exist "%ORIGINAL_PATH%Blank.ico" (
         copy "%ORIGINAL_PATH%Blank.ico" "C:\Windows\Blank.ico" /Y
     ) else (
-        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/1.0.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
+        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.1.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
     )
 )
 
@@ -242,6 +390,21 @@ echo.
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\History]
 echo "AutoColor"=dword:00000001
 echo.
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes]
+echo "CurrentTheme"="C:\\WINDOWS\\resources\\Themes\\dark.theme"
+echo.
+echo ;Visible Places
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start]
+echo "VisiblePlaces"=hex:86,08,73,52,aa,51,43,42,9f,7b,27,76,58,46,59,d4
+echo.
+echo ;SearchboxTaskbarMode
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+echo "SearchboxTaskbarMode"=dword:00000000
+echo.
+echo ;ShowTaskViewButton
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+echo "ShowTaskViewButton"=dword:00000000
+echo.
 echo ;Set Explore This PC
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 echo "LaunchTo"=dword:00000001
@@ -261,6 +424,7 @@ echo ;Shortcut
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
 echo "link"=hex:00,00,00,00
 echo.
+echo ;Shell Icon
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons]
 echo "29"="!shellIconValue!"
 echo.
@@ -273,12 +437,15 @@ echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
 echo "HideRecentlyAddedApps"=dword:00000001
 echo "ShowOrHideMostUsedApps"=dword:00000002
 echo.
+echo ;No Recent Docs History
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
 echo "NoRecentDocsHistory"=dword:00000001
 echo.
+echo ;Start_TrackDocs
 echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 echo "Start_TrackDocs"=dword:00000000
 echo.
+echo ;Disable Subscribed Content
 echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
 echo "SubscribedContent-338388Enabled"=dword:00000000
 echo.
@@ -302,7 +469,7 @@ del "%TEMP%\Windows_Settings.reg"
 
 taskkill /F /IM explorer.exe
 start explorer.exe
-goto :winget_installed
+goto :main menu
 
 :install_microsoft_store
 cls
@@ -317,40 +484,40 @@ powershell -Command "Get-AppxPackage Microsoft.StoreApp -ErrorAction SilentlyCon
 if %errorlevel% equ 0 (
     echo x Microsoft Store est déjà installé
     echo.
-    echo Appuyez sur une touche pour revenir au menu principal
+    echo Appuyez sur une touche pour revenir au menu
     pause >nul
-    goto :winget_installed
+    goto :main menu
 ) else (
     set "tempFolder=%TEMP%\MicrosoftStoreInstall"
     mkdir "%tempFolder%" 2>nul
 
     echo - Téléchargement des fichiers nécessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/1.0.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
 
     echo - Installation de Microsoft Store et ses composants
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml'"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx'"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx'"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle'"
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.appxbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml'"
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.appxbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml'"
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx' -ErrorAction SilentlyContinue | Out-Null"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx' -ErrorAction SilentlyContinue | Out-Null"
+    powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle' -ErrorAction SilentlyContinue | Out-Null"
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.appxbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
+    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.appxbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
 
-    rmdir /s /q "%tempFolder%"
+    rmdir /s /q "%tempFolder%" 2>nul
 
     echo.
-    echo Microsoft Store et ses composants ont été installés avec succès
+    echo ► Microsoft Store installé avec succès
     echo.
-    echo Appuyez sur une touche pour revenir au menu principal
+    echo Appuyez sur une touche pour revenir au menu
     pause >nul
-    goto :winget_installed
+    goto :main menu
 )
 
 :end_of_script
