@@ -60,7 +60,7 @@ where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
     echo ► Version de Winget : %winget_version%
-    goto :main menu
+    goto :main_menu
 ) else (
     echo x Winget n'est pas installé sur votre système
     exit /b 1
@@ -108,9 +108,9 @@ call :version_winget
 echo.
 echo Appuyez sur une touche pour continuer
 pause >nul
-goto :main menu
+goto :main_menu
 
-:main menu
+:main_menu
 cls
 echo %ligne1%
 echo %ligne2%
@@ -121,12 +121,13 @@ echo.
 
 echo 1 - Installation de programmes
 echo 2 - Installation de Microsoft Store
-echo 3 - Fonctionnalités Windows
-echo 4 - Activation de Windows
-echo 5 - Exécution de WinUtil
-echo 6 - Application des paramètres Windows
+echo 3 - Installation Microsoft Office
+echo 4 - Fonctionnalités Windows
+echo 5 - Activation de Windows / Office
+echo 6 - Exécution de WinUtil
+echo 7 - Application des paramètres Windows
 echo.
-echo 7 - Quitter
+echo 8 - Quitter
 echo.
 echo %ligne1%
 echo.
@@ -134,11 +135,12 @@ set /p choix=■ Sélectionner une option :
 
 if "%choix%"=="1" goto :install_programmes
 if "%choix%"=="2" goto :install_microsoft_store
-if "%choix%"=="3" goto :windows_features
-if "%choix%"=="4" goto :activate_windows
-if "%choix%"=="5" goto :run_winutil
-if "%choix%"=="6" goto :apply_windows_settings
-if "%choix%"=="7" goto :end_of_script
+if "%choix%"=="3" goto :install_microsoft_office
+if "%choix%"=="4" goto :windows_features
+if "%choix%"=="5" goto :activate_windows
+if "%choix%"=="6" goto :run_winutil
+if "%choix%"=="7" goto :apply_windows_settings
+if "%choix%"=="8" goto :end_of_script
 
 :windows_features
 cls
@@ -156,7 +158,7 @@ echo 0 - Retour au menu principal
 echo.
 set /p feature_choice=�  Sélectionner une option : 
 
-if "%feature_choice%"=="0" goto :main menu
+if "%feature_choice%"=="0" goto :main_menu
 if "%feature_choice%"=="1" goto :enable_hyperv
 if "%feature_choice%"=="2" goto :enable_sandbox
 if "%feature_choice%"=="3" goto :enable_dotnet35
@@ -228,11 +230,11 @@ goto :windows_features
 
 :activate_windows
 powershell -Command "irm https://get.activated.win | iex"
-goto :main menu
+goto :main_menu
 
 :run_winutil
 powershell -Command "irm https://christitus.com/win | iex"
-goto :main menu
+goto :main_menu
 
 :install_programmes
 cls
@@ -266,7 +268,7 @@ echo %ligne1%
 echo.
 set /p choix=■ Saisir les numéros (séparés par des espaces) : 
 
-if "%choix%"=="0" goto :main menu
+if "%choix%"=="0" goto :main_menu
 if /i "%choix%"=="A" goto :install_all_programs
 
 for %%i in (%choix%) do (
@@ -349,7 +351,7 @@ if !errorlevel! equ 0 (
 echo.
 echo Appuyez sur une touche pour continuer
 pause >nul
-goto :main menu
+goto :main_menu
 
 :apply_windows_settings
 cls
@@ -469,7 +471,7 @@ del "%TEMP%\Windows_Settings.reg"
 
 taskkill /F /IM explorer.exe
 start explorer.exe
-goto :main menu
+goto :main_menu
 
 :install_microsoft_store
 cls
@@ -517,8 +519,35 @@ if %errorlevel% equ 0 (
     echo.
     echo Appuyez sur une touche pour revenir au menu
     pause >nul
-    goto :main menu
+    goto :main_menu
 )
+
+
+:install_microsoft_office
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Microsoft Office
+echo.
+
+set "tempFolder=%TEMP%\MicrosoftOfficeInstall"
+mkdir "%tempFolder%" 2>nul
+
+echo � Téléchargement de Microsoft Office
+powershell -Command "Invoke-WebRequest -Uri 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=fr-fr&version=O16GA' -OutFile '%tempFolder%\OfficeSetup.exe' -ErrorAction SilentlyContinue | Out-Null"
+echo.
+echo � Installation de Microsoft Office
+start /wait "" "%tempFolder%\OfficeSetup.exe"
+echo.
+echo � Nettoyage des fichiers temporaires
+rmdir /s /q "%tempFolder%" 2>nul
+
+echo.
+echo Appuyez sur une touche pour revenir au menu
+pause >nul
+goto :main_menu
 
 :end_of_script
 cls
