@@ -1,0 +1,34 @@
+7zip|7zip.7zip
+Clink|chrisant996.Clink
+Cursor.ai|Anysphere.Cursor
+Docker Desktop|Docker.DockerDesktop
+Everything|voidtools.Everything
+ExplorerPatcher|valinet.ExplorerPatcher.Prerelease
+GeForce Now|Nvidia.GeForceNow
+Git|Git.Git
+GitHub Desktop|GitHub.GitHubDesktop
+Google Chrome|Google.Chrome
+Google Drive|Google.GoogleDrive
+Microsoft .NET 3.1|Microsoft.DotNet.DesktopRuntime.3_1
+Microsoft .NET 5|Microsoft.DotNet.DesktopRuntime.5
+Microsoft .NET 6|Microsoft.DotNet.Runtime.6
+Microsoft .NET 7|Microsoft.DotNet.DesktopRuntime.7
+Microsoft .NET 8|Microsoft.DotNet.DesktopRuntime.8
+Microsoft Paint|9PCFS5B6T72H
+Microsoft PC Manager|Microsoft.PCManager
+Microsoft Photos|9WZDNCRFJBH4
+Microsoft Capture|9MZ95KL8MR0L
+Microsoft Visual C++ 2015-2022|Microsoft.VCRedist.2015+.x64
+Nilesoft Shell|Nilesoft.Shell
+Obsidian|Obsidian.Obsidian
+OhMyPosh|JanDeDobbeleer.OhMyPosh
+Password Manager SafeInCloud|9NLXL1B6J7LW
+PowerShell|Microsoft.PowerShell
+PowerToys|Microsoft.PowerToys
+VLC|VideoLAN.VLC
+Visual Studio Code|Microsoft.VisualStudioCode
+Windows Calculator|9WZDNCRFHVN5
+Windows Notepad|9MSMLRH6LZF3
+Windows Terminal|Microsoft.WindowsTerminal
+Windhawk|RamenSoftware.Windhawk
+WizTree|AntibodySoftware.WizTree

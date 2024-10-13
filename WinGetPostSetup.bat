@@ -2,20 +2,13 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-if "%WT_SESSION%"=="" (
-    where wt >nul 2>&1
-    if %errorlevel% equ 0 (
-        start wt "%~dpnx0"
-        exit /b
-    )
-)
-
 set "ligne1============================================"
 set "ligne2=               OhMyWindows                 "
 set "ligne3============================================"
 
 :: Sauvegarder le chemin d'origine
 if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%~dp0"
+
 
 :: Vérifier les privilèges administrateur et relancer si nécessaire
 net session >nul 2>&1
@@ -60,14 +53,27 @@ where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
     echo ► Version de Winget : %winget_version%
-    goto :main_menu
+    goto :check_windows_terminal
 ) else (
     echo x Winget n'est pas installé sur votre système
-    exit /b 1
+    goto :install_winget
 )
 
-call :version_winget
+:check_windows_terminal
+if "%WT_SESSION%"=="" (
+    where wt >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo Windows Terminal est déj� installé
+        echo Redémarrage du script dans Windows Terminal
+        start wt "%~dpnx0"
+        exit /b
+    ) else (
+        goto :install_windows_terminal
+    )
+)
+goto :main_menu
 
+:install_winget
 cls
 echo %ligne1%
 echo %ligne2%
@@ -106,9 +112,31 @@ echo.
 echo ► Winget a été installé avec succès !
 call :version_winget
 echo.
-echo Appuyez sur une touche pour continuer
-pause >nul
-goto :main_menu
+pause
+goto :install_windows_terminal
+
+:install_windows_terminal
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Windows Terminal
+echo.
+winget install Microsoft.WindowsTerminal --accept-source-agreements --accept-package-agreements
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Windows Terminal a été installé avec succès !
+    echo Redémarrage du script dans Windows Terminal
+    timeout /t 3 >nul
+    start wt "%~dpnx0"
+    exit /b
+) else (
+    echo.
+    echo x Échec de l'installation de Windows Terminal
+    echo Continuation du script dans la fenêtre actuelle
+    timeout /t 3 >nul
+)
 
 :main_menu
 cls
@@ -148,7 +176,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo �  Fonctionnalités Windows
+echo ■ Fonctionnalités Windows
 echo.
 echo 1 - Hyper-V
 echo 2 - Sandbox
@@ -156,7 +184,7 @@ echo 3 - .NET Framework 3.5
 echo.
 echo 0 - Retour au menu principal
 echo.
-set /p feature_choice=�  Sélectionner une option : 
+set /p feature_choice=■ Sélectionner une option : 
 
 if "%feature_choice%"=="0" goto :main_menu
 if "%feature_choice%"=="1" goto :enable_hyperv
@@ -164,65 +192,83 @@ if "%feature_choice%"=="2" goto :enable_sandbox
 if "%feature_choice%"=="3" goto :enable_dotnet35
 
 echo.
-echo Option invalide. Veuillez réessayer.
+echo Option invalide. Veuillez réessayer
 pause
 goto :windows_features
 
 :enable_hyperv
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
 echo.
-echo Installation de Hyper-V...
+echo ■ Installation de Hyper-V
 DISM /Online /Enable-Feature /All /FeatureName:Microsoft-Hyper-V /NoRestart
 if %errorlevel% equ 0 (
     echo.
-    echo ► Hyper-V a été installé avec succès.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+    echo ► Hyper-V a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
     echo.
-    echo ► Hyper-V a été installé avec succès.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+    echo ► Hyper-V a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo.
-    echo x Échec de l'installation de Hyper-V.
+    echo x Échec de l'installation de Hyper-V
 )
 echo.
 pause
 goto :windows_features
 
 :enable_sandbox
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
 echo.
-echo Installation de Windows Sandbox...
+echo ■ Installation de Windows Sandbox
 DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
 if %errorlevel% equ 0 (
     echo.
-    echo ► Windows Sandbox a été installé avec succès.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
     echo.
-    echo ► Windows Sandbox a été installé avec succès.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo.
-    echo x Échec de l'installation de Windows Sandbox.
+    echo x Échec de l'installation de Windows Sandbox
 )
 echo.
 pause
 goto :windows_features
 
 :enable_dotnet35
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
 echo.
-echo Installation de .NET Framework 3.5...
+echo ■ Installation de .NET Framework 3.5
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
 if %errorlevel% equ 0 (
     echo.
-    echo ► .NET Framework 3.5 a été installé avec succès.
-    echo Un redémarrage peut être nécessaire pour finaliser l'installation.
+    echo ► .NET Framework 3.5 a été installé avec succès
+    echo.
+    echo Un redémarrage peut être nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
     echo.
-    echo ► .NET Framework 3.5 a été installé avec succès.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation.
+    echo ► .NET Framework 3.5 a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo.
-    echo x Échec de l'installation de .NET Framework 3.5.
+    echo x Échec de l'installation de .NET Framework 3.5
 )
 echo.
 pause
@@ -317,8 +363,7 @@ for %%i in (%choix%) do (
 )
 
 echo.
-echo Appuyez sur une touche pour continuer
-pause >nul
+pause
 goto :install_programmes
 
 :install_all_programs
@@ -349,8 +394,7 @@ if !errorlevel! equ 0 (
 )
 
 echo.
-echo Appuyez sur une touche pour continuer
-pause >nul
+pause
 goto :main_menu
 
 :apply_windows_settings
@@ -363,8 +407,7 @@ echo ■ Application des paramètres Windows
 echo.
 echo - Redémarrage de l'explorateur nécessaire
 echo.
-echo Appuyez sur une touche pour continuer
-pause >nul
+pause
 
 if not exist "C:\Windows\Blank.ico" (
     if exist "%ORIGINAL_PATH%Blank.ico" (
@@ -482,13 +525,12 @@ echo.
 echo ■ Installation de Microsoft Store
 echo.
 
-powershell -Command "Get-AppxPackage Microsoft.StoreApp -ErrorAction SilentlyContinue" >nul 2>&1
+powershell -Command "if (Get-AppxPackage Microsoft.WindowsStore) { exit 0 } else { exit 1 }" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo x Microsoft Store est déjà installé
+    echo x Microsoft Store est d�j� install�
     echo.
-    echo Appuyez sur une touche pour revenir au menu
-    pause >nul
-    goto :main menu
+    pause
+    goto :main_menu 
 ) else (
     set "tempFolder=%TEMP%\MicrosoftStoreInstall"
     mkdir "%tempFolder%" 2>nul
@@ -517,8 +559,7 @@ if %errorlevel% equ 0 (
     echo.
     echo ► Microsoft Store installé avec succès
     echo.
-    echo Appuyez sur une touche pour revenir au menu
-    pause >nul
+    pause
     goto :main_menu
 )
 
@@ -535,18 +576,31 @@ echo.
 set "tempFolder=%TEMP%\MicrosoftOfficeInstall"
 mkdir "%tempFolder%" 2>nul
 
-echo � Téléchargement de Microsoft Office
-powershell -Command "Invoke-WebRequest -Uri 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=fr-fr&version=O16GA' -OutFile '%tempFolder%\OfficeSetup.exe' -ErrorAction SilentlyContinue | Out-Null"
-echo.
-echo � Installation de Microsoft Office
-start /wait "" "%tempFolder%\OfficeSetup.exe"
-echo.
-echo � Nettoyage des fichiers temporaires
+echo - Téléchargement de Microsoft Office
+start /wait bitsadmin /transfer OfficeSetupDownload /dynamic /priority high ^
+    "https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=fr-fr&version=O16GA" ^
+    "%tempFolder%\OfficeSetup.exe"
+
+if %errorlevel% equ 0 (
+    echo - Installation de Microsoft Office
+    start /wait "" "%tempFolder%\OfficeSetup.exe"
+    if %errorlevel% equ 0 (
+        echo.
+        echo ► Microsoft Office installé avec succès
+    ) else (    
+        echo.
+        echo x Échec de l'installation de Microsoft Office
+    )
+) else (
+    echo.
+    echo x Échec du téléchargement de Microsoft Office
+)
+
+echo - Nettoyage des fichiers temporaires
 rmdir /s /q "%tempFolder%" 2>nul
 
 echo.
-echo Appuyez sur une touche pour revenir au menu
-pause >nul
+pause
 goto :main_menu
 
 :end_of_script
@@ -557,7 +611,6 @@ echo %ligne3%
 echo.
 echo ► Script terminé !
 echo.
-echo Appuyez sur une touche pour quitter
-pause >nul
+pause
 
 endlocal
