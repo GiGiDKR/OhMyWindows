@@ -2,9 +2,9 @@
 chcp 65001 >nul
 setlocal enabledelayedexpansion
 
-set "ligne1============================================"
+set "ligne1=============================================="
 set "ligne2=               OhMyWindows                 "
-set "ligne3============================================"
+set "ligne3=============================================="
 
 :: Sauvegarder le chemin d'origine
 if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%~dp0"
@@ -63,7 +63,7 @@ if %errorlevel% equ 0 (
 if "%WT_SESSION%"=="" (
     where wt >nul 2>&1
     if %errorlevel% equ 0 (
-        echo Windows Terminal est déj� installé
+        echo Windows Terminal est déj� installé
         echo Redémarrage du script dans Windows Terminal
         start wt "%~dpnx0"
         exit /b
@@ -134,7 +134,7 @@ if %errorlevel% equ 0 (
 ) else (
     echo.
     echo x Échec de l'installation de Windows Terminal
-    echo Continuation du script dans la fenêtre actuelle
+    echo Poursuite du script dans la fenêtre actuelle
     timeout /t 3 >nul
 )
 
@@ -153,7 +153,7 @@ echo 3 - Installation Microsoft Office
 echo 4 - Fonctionnalités Windows
 echo 5 - Activation de Windows / Office
 echo 6 - Exécution de WinUtil
-echo 7 - Application des paramètres Windows
+echo 7 - Paramètres Windows
 echo.
 echo 8 - Quitter
 echo.
@@ -167,8 +167,32 @@ if "%choix%"=="3" goto :install_microsoft_office
 if "%choix%"=="4" goto :windows_features
 if "%choix%"=="5" goto :activate_windows
 if "%choix%"=="6" goto :run_winutil
-if "%choix%"=="7" goto :apply_windows_settings
+if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :end_of_script
+
+:windows_settings_menu
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Paramètres Windows
+echo.
+echo 1 - Registre Windows
+echo 2 - Fonds d'écran
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p settings_choice=■ Sélectionner une option : 
+
+if "%settings_choice%"=="0" goto :main_menu
+if "%settings_choice%"=="1" goto :apply_windows_settings
+if "%settings_choice%"=="2" goto :wallpaper_dl
+
+echo.
+echo Option invalide. Veuillez réessayer
+pause
+goto :windows_settings_menu
 
 :windows_features
 cls
@@ -227,21 +251,54 @@ cls
 echo %ligne1%
 echo %ligne2%
 echo %ligne3%
-echo.
-echo ■ Installation de Windows Sandbox
-DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
-if %errorlevel% equ 0 (
-    echo.
-    echo ► Windows Sandbox a été installé avec succès
-    echo.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation
-) else if %errorlevel% equ 3010 (
-    echo.
-    echo ► Windows Sandbox a été installé avec succès
+echo.echo ► Hyper-V a été installé avec succès
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo.
+    echo x Échec de l'installation de Hyper-V
+)
+echo.
+pause
+goto :windows_features
+
+:enable_sandbox
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Windows Sandbox
+DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
+if %errorlevel% equ 0 (
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) elseif %errorlevel% equ 3010 (
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) else (
+    echo x Échec de l'installation de Windows Sandbox
+)
+echo.
+pause
+goto :windows_features
+
+:enable_dotnet35
+cls
+echo %ligne1%
+echo ■ Installation de Windows Sandbox
+DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
+if %errorlevel% equ 0 (
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) else if %errorlevel% equ 3010 (
+    echo ► Windows Sandbox a été installé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) else (
     echo x Échec de l'installation de Windows Sandbox
 )
 echo.
@@ -257,17 +314,14 @@ echo.
 echo ■ Installation de .NET Framework 3.5
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
 if %errorlevel% equ 0 (
-    echo.
     echo ► .NET Framework 3.5 a été installé avec succès
     echo.
     echo Un redémarrage peut être nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
-    echo.
     echo ► .NET Framework 3.5 a été installé avec succès
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
-    echo.
     echo x Échec de l'installation de .NET Framework 3.5
 )
 echo.
@@ -330,7 +384,7 @@ for %%i in (%choix%) do (
                 echo %ligne2%
                 echo %ligne3%
                 echo.
-                echo � Installation de Cleanmgr+
+                echo - Installation de Cleanmgr+
                 powershell -Command "& {$tempFile = [System.IO.Path]::GetTempFileName() + '.zip'; Invoke-WebRequest -Uri 'https://github.com/builtbybel/CleanmgrPlus/releases/download/1.50.1300/cleanmgrplus.zip' -OutFile $tempFile -ErrorAction SilentlyContinue | Out-Null; New-Item -ItemType Directory -Path 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; Expand-Archive -Path $tempFile -DestinationPath 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', 'Cleanmgr+.lnk')); $Shortcut.TargetPath = 'C:\Program Files\Cleanmgr+\Cleanmgr+.exe'; $Shortcut.Save(); $Shell = New-Object -ComObject Shell.Application; $Folder = $Shell.Namespace('C:\Program Files\Cleanmgr+'); $Item = $Folder.ParseName('Cleanmgr+.exe'); if ($Item) { $Item.InvokeVerb('pin to start') }; Remove-Item $tempFile -Force -ErrorAction SilentlyContinue | Out-Null}" 2>nul
                 if !errorlevel! equ 0 (
                     echo.
@@ -346,7 +400,7 @@ for %%i in (%choix%) do (
             echo %ligne2%
             echo %ligne3%
             echo.
-            echo � Installation de !name!
+            echo - Installation de !name!
             winget install !id! --silent --accept-source-agreements --accept-package-agreements
             if !errorlevel! equ 0 (
                 echo.
@@ -372,7 +426,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo � Installation de tous les programmes
+echo ■ Installation de tous les programmes
 for /f "tokens=1,2 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
     echo.
     echo - Installation de %%a
@@ -405,7 +459,7 @@ echo %ligne3%
 echo.
 echo ■ Application des paramètres Windows
 echo.
-echo - Redémarrage de l'explorateur nécessaire
+echo ■ Redémarrage de l'explorateur nécessaire
 echo.
 pause
 
@@ -527,7 +581,7 @@ echo.
 
 powershell -Command "if (Get-AppxPackage Microsoft.WindowsStore) { exit 0 } else { exit 1 }" >nul 2>&1
 if %errorlevel% equ 0 (
-    echo x Microsoft Store est d�j� install�
+    echo x Microsoft Store est déjà installé
     echo.
     pause
     goto :main_menu 
@@ -614,3 +668,47 @@ echo.
 pause
 
 endlocal
+
+:wallpaper_dl
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Téléchargement et installation du fond d'écran
+echo.
+
+set "tempFolder=%TEMP%\WallpaperDownload"
+set "extractFolder=C:\Users\%username%\Pictures\Wallpapers"
+mkdir "%tempFolder%" 2>nul
+mkdir "%extractFolder%" 2>nul
+
+echo - Téléchargement du fond d'écran
+start /wait bitsadmin /transfer WallpaperDownload /dynamic /priority high ^
+    "https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/Wallpaper.zip" ^
+    "%tempFolder%\Wallpaper.zip"
+
+if %errorlevel% equ 0 (
+    echo - Extraction du fond d'écran
+    powershell -Command "Expand-Archive -Path '%tempFolder%\Wallpaper.zip' -DestinationPath '%extractFolder%' -Force"
+    if %errorlevel% equ 0 (
+        echo - Configuration du fond d'écran
+        reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v WallPaper /t REG_SZ /d "C:\Users\%username%\Pictures\Wallpapers\purple.png" /f
+        if %errorlevel% equ 0 (
+            echo ► Fond d'écran installé avec succès
+        ) else (     
+            echo x Échec de la configuration du fond d'écran
+        )
+    ) else (
+        echo x Échec de l'extraction du fond d'écran
+    )
+) else (
+    echo x Échec du téléchargement du fond d'écran
+)
+
+echo - Nettoyage des fichiers temporaires
+rmdir /s /q "%tempFolder%" 2>nul
+
+echo.
+pause
+goto :main_menu
