@@ -292,7 +292,7 @@ echo ■ Sélection des programmes à installer
 echo.
 
 if not exist "%ORIGINAL_PATH%packages.txt" (
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.1.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
 )
 
 set "counter=1"
@@ -413,7 +413,7 @@ if not exist "C:\Windows\Blank.ico" (
     if exist "%ORIGINAL_PATH%Blank.ico" (
         copy "%ORIGINAL_PATH%Blank.ico" "C:\Windows\Blank.ico" /Y
     ) else (
-        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.1.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
+        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
     )
 )
 
@@ -537,14 +537,14 @@ if %errorlevel% equ 0 (
 
     echo - Téléchargement des fichiers nécessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.1.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
 
     echo - Installation de Microsoft Store et ses composants
     powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
