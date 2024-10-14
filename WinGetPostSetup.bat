@@ -155,8 +155,10 @@ echo 5 - Activation de Windows / Office
 echo 6 - WinUtil
 echo 7 - Paramètres Windows
 echo 8 - Nettoyage de Windows
+echo 9 - Installer la police Meslo LGL Nerd
+echo 10 - Configuration du profil PowerShell
 echo.
-echo 9 - Quitter
+echo 0 - Quitter
 echo.
 echo %ligne1%
 echo.
@@ -170,7 +172,9 @@ if "%choix%"=="5" goto :activate_windows
 if "%choix%"=="6" goto :winutil_menu
 if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :clean_windows
-if "%choix%"=="9" goto :end_of_script
+if "%choix%"=="9" goto :install_fonts
+if "%choix%"=="10" goto :configure_powershell_profile
+if "%choix%"=="0" goto :end_of_script
 
 echo.
 echo Option invalide. Veuillez réessayer.
@@ -745,6 +749,80 @@ if %errorlevel% equ 0 (
 
 echo - Nettoyage des fichiers temporaires
 rmdir /s /q "%tempFolder%" 2>nul
+
+echo.
+pause
+goto :main_menu
+
+:install_fonts
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de la police Meslo LGL Nerd
+echo.
+
+set "tempFolder=%TEMP%\Font"
+set "fontUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/MesloLGLNerdFont.zip"
+set "fontZip=%tempFolder%\MesloLGLNerdFont.zip"
+set "extractFolder=%tempFolder%\MesloLGLNerdFont"
+
+mkdir "%tempFolder%" 2>nul
+mkdir "%extractFolder%" 2>nul
+
+echo - Téléchargement des polices
+powershell -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%fontUrl%' -OutFile '%fontZip%' }"
+
+if %errorlevel% equ 0 (
+    echo - Extraction des polices
+    powershell -Command "Expand-Archive -Path '%fontZip%' -DestinationPath '%extractFolder%' -Force"
+    if %errorlevel% equ 0 (
+        echo - Installation des polices
+        for %%F in ("%extractFolder%\*.ttf") do (
+            powershell -Command "& { Add-Type -AssemblyName System.Drawing; $fontCollection = New-Object System.Drawing.Text.PrivateFontCollection; $fontCollection.AddFontFile('%%F'); $fontName = $fontCollection.Families[0].Name; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere('%%F', 0x10); }"
+        )
+        echo - Nettoyage des fichiers temporaires
+        rmdir /s /q "%extractFolder%" 2>nul
+        echo.
+        echo ► Polices installées avec succès
+    ) else (
+        echo x Échec de l'extraction des polices
+    )
+) else (
+    echo.
+    echo x Échec du téléchargement des polices
+)
+
+echo.
+pause
+goto :main_menu
+
+:configure_powershell_profile
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration du profil PowerShell
+echo.
+
+echo - Installation des modules PowerShell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Get-Module -ListAvailable -Name PowerShellGet)) { Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber }; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module oh-my-posh -Scope CurrentUser -Force -AllowClobber; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber }"
+
+echo - Installation de fzf
+winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
+
+echo - Téléchargement du profil PowerShell
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
+
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Profil PowerShell configuré avec succès
+) else (
+    echo.
+    echo x Échec de la configuration du profil PowerShell
+)
 
 echo.
 pause
