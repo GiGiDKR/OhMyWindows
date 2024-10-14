@@ -36,4 +36,3 @@ upgrade=winget upgrade $*
 search=winget search $*
 alias=doskey $*
 list=doskey /macros
-s20=scrcpy --tcpip=192.168.1.12 --video-codec=h265
