@@ -288,26 +288,6 @@ goto :windows_features
 :enable_dotnet35
 cls
 echo %ligne1%
-echo ■ Installation de Windows Sandbox
-DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
-if %errorlevel% equ 0 (
-    echo ► Windows Sandbox a été installé avec succès
-    echo.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation
-) else if %errorlevel% equ 3010 (
-    echo ► Windows Sandbox a été installé avec succès
-    echo.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation
-) else (
-    echo x Échec de l'installation de Windows Sandbox
-)
-echo.
-pause
-goto :windows_features
-
-:enable_dotnet35
-cls
-echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
@@ -617,7 +597,6 @@ if %errorlevel% equ 0 (
     goto :main_menu
 )
 
-
 :install_microsoft_office
 cls
 echo %ligne1%
@@ -656,18 +635,6 @@ rmdir /s /q "%tempFolder%" 2>nul
 echo.
 pause
 goto :main_menu
-
-:end_of_script
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ► Script terminé !
-echo.
-pause
-
-endlocal
 
 :wallpaper_dl
 cls
@@ -712,3 +679,15 @@ rmdir /s /q "%tempFolder%" 2>nul
 echo.
 pause
 goto :main_menu
+
+:end_of_script
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ► Script terminé !
+echo.
+pause
+
+endlocal
