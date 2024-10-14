@@ -7,6 +7,7 @@ ExplorerPatcher|valinet.ExplorerPatcher.Prerelease
 GeForce Now|Nvidia.GeForceNow
 Git|Git.Git
 GitHub Desktop|GitHub.GitHubDesktop
+Glary Utilities|Glarysoft.GlaryUtilities
 Google Chrome|Google.Chrome
 Google Drive|Google.GoogleDrive
 Microsoft .NET 3.1|Microsoft.DotNet.DesktopRuntime.3_1

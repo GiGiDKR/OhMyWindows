@@ -152,7 +152,7 @@ echo 2 - Installation de Microsoft Store
 echo 3 - Installation Microsoft Office
 echo 4 - Fonctionnalités Windows
 echo 5 - Activation de Windows / Office
-echo 6 - Exécution de WinUtil
+echo 6 - WinUtil
 echo 7 - Paramètres Windows
 echo 8 - Nettoyage de Windows
 echo.
@@ -167,10 +167,74 @@ if "%choix%"=="2" goto :install_microsoft_store
 if "%choix%"=="3" goto :install_microsoft_office
 if "%choix%"=="4" goto :windows_features
 if "%choix%"=="5" goto :activate_windows
-if "%choix%"=="6" goto :run_winutil
+if "%choix%"=="6" goto :winutil_menu
 if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :clean_windows
 if "%choix%"=="9" goto :end_of_script
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :main_menu
+
+:winutil_menu
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ WinUtil
+echo.
+echo 1 - Exécuter WinUtil
+echo 2 - Installer WinUtil
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p winutil_choice=■ Sélectionner une option : 
+
+if "%winutil_choice%"=="0" goto :main_menu
+if "%winutil_choice%"=="1" goto :run_winutil
+if "%winutil_choice%"=="2" goto :install_winutil
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :winutil_menu
+
+:run_winutil
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Exécution de WinUtil
+echo.
+powershell -Command "irm https://christitus.com/win | iex"
+echo.
+pause
+goto :main_menu
+
+:install_winutil
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de WinUtil
+echo.
+call :create_winutil_shortcut
+echo.
+pause
+goto :main_menu
+
+:create_winutil_shortcut
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $desktopPath = [Environment]::GetFolderPath('Desktop'); $shortcutPath = Join-Path $desktopPath 'winutil.lnk'; $shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut($shortcutPath); $shortcut.TargetPath = 'powershell.exe'; $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -Command ""irm https://christitus.com/win | iex""'; $shortcut.WorkingDirectory = $env:USERPROFILE; $winutilDir = Join-Path $env:LOCALAPPDATA 'WinUtil'; $iconPath = Join-Path $winutilDir 'cttlogo.ico'; if (-not (Test-Path $iconPath)) { New-Item -ItemType Directory -Force -Path $winutilDir | Out-Null; Invoke-WebRequest -Uri 'https://christitus.com/images/logo-full.ico' -OutFile $iconPath }; if (Test-Path $iconPath) { $shortcut.IconLocation = $iconPath }; $shortcut.Save(); $bytes = [System.IO.File]::ReadAllBytes($shortcutPath); $bytes[0x15] = $bytes[0x15] -bor 0x20; [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)}"
+if %errorlevel% equ 0 (
+    echo ► Raccourci WinUtil créé sur le bureau
+) else (
+    echo x Échec de la création du raccourci WinUtil
+)
+goto :eof
 
 :clean_windows
 cls
@@ -320,10 +384,6 @@ goto :windows_features
 
 :activate_windows
 powershell -Command "irm https://get.activated.win | iex"
-goto :main_menu
-
-:run_winutil
-powershell -Command "irm https://christitus.com/win | iex"
 goto :main_menu
 
 :install_programmes
