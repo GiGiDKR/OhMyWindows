@@ -1,4 +1,4 @@
-![Logo OhMyWindows](logo.png)
+![Logo OhMyWindows](logo.jpg)
 
 # Windows 11 post-setup script with .dotfile config <sup> *(WIP)* </sup>
 
