@@ -63,7 +63,7 @@ if %errorlevel% equ 0 (
 if "%WT_SESSION%"=="" (
     where wt >nul 2>&1
     if %errorlevel% equ 0 (
-        echo Windows Terminal est déj installé
+        echo Windows Terminal est déjà installé
         echo Redémarrage du script dans Windows Terminal
         start wt "%~dpnx0"
         exit /b
