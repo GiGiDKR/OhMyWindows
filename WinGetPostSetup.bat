@@ -63,7 +63,7 @@ if %errorlevel% equ 0 (
 if "%WT_SESSION%"=="" (
     where wt >nul 2>&1
     if %errorlevel% equ 0 (
-        echo Windows Terminal est déj� installé
+        echo Windows Terminal est déj installé
         echo Redémarrage du script dans Windows Terminal
         start wt "%~dpnx0"
         exit /b
@@ -154,8 +154,9 @@ echo 4 - Fonctionnalités Windows
 echo 5 - Activation de Windows / Office
 echo 6 - Exécution de WinUtil
 echo 7 - Paramètres Windows
+echo 8 - Nettoyage de Windows
 echo.
-echo 8 - Quitter
+echo 9 - Quitter
 echo.
 echo %ligne1%
 echo.
@@ -168,7 +169,32 @@ if "%choix%"=="4" goto :windows_features
 if "%choix%"=="5" goto :activate_windows
 if "%choix%"=="6" goto :run_winutil
 if "%choix%"=="7" goto :windows_settings_menu
-if "%choix%"=="8" goto :end_of_script
+if "%choix%"=="8" goto :clean_windows
+if "%choix%"=="9" goto :end_of_script
+
+:clean_windows
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Nettoyage de Windows
+echo.
+
+echo - Nettoyage des fichiers temporaires
+del /q /f /s %TEMP%\* >nul 2>&1
+del /q /f /s C:\Windows\Temp\* >nul 2>&1
+
+echo - Exécution de Dism.exe
+Dism.exe /online /Cleanup-Image /StartComponentCleanup >nul 2>&1
+
+echo - Exécution de cleanmgr
+start /wait cleanmgr /sagerun:1 >nul 2>&1
+
+echo.
+echo ► Nettoyage terminé
+pause
+goto :main_menu
 
 :windows_settings_menu
 cls
@@ -236,22 +262,6 @@ if %errorlevel% equ 0 (
 ) else if %errorlevel% equ 3010 (
     echo.
     echo ► Hyper-V a été installé avec succès
-    echo.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation
-) else (
-    echo.
-    echo x Échec de l'installation de Hyper-V
-)
-echo.
-pause
-goto :windows_features
-
-:enable_sandbox
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.echo ► Hyper-V a été installé avec succès
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
