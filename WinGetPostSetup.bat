@@ -169,34 +169,246 @@ echo 2 - Installation de Microsoft Store
 echo 3 - Installation Microsoft Office
 echo 4 - Fonctionnalités Windows
 echo 5 - Activation de Windows / Office
-echo 6 - WinUtil
-echo 7 - Paramètres Windows
-echo 8 - Nettoyage de Windows
-echo 9 - Configuration du Terminal
-echo 10 - Mise à jour des programmes
+echo 6 - Optimiser Windows
+echo 7 - Outils Android
 echo.
 echo 0 - Quitter
 echo.
-echo %ligne1%
-echo.
-set /p choix=■ Sélectionner une option : 
+set /p main_choice=■ Sélectionner une option : 
 
-if "%choix%"=="1" goto :install_programmes
-if "%choix%"=="2" goto :install_microsoft_store
-if "%choix%"=="3" goto :install_microsoft_office
-if "%choix%"=="4" goto :windows_features
-if "%choix%"=="5" goto :activate_windows
-if "%choix%"=="6" goto :winutil_menu
-if "%choix%"=="7" goto :windows_settings_menu
-if "%choix%"=="8" goto :clean_windows
-if "%choix%"=="9" goto :configure_terminal
-if "%choix%"=="10" goto :upgrade_programs
-if "%choix%"=="0" goto :end_of_script
+if "%main_choice%"=="0" goto :end_of_script
+if "%main_choice%"=="1" goto :install_programs
+if "%main_choice%"=="2" goto :install_store
+if "%main_choice%"=="3" goto :install_office
+if "%main_choice%"=="4" goto :windows_features
+if "%main_choice%"=="5" goto :activate_windows
+if "%main_choice%"=="6" goto :optimize_windows
+if "%main_choice%"=="7" goto :android_tools
 
 echo.
 echo Option invalide. Veuillez réessayer.
 pause
 goto :main_menu
+
+:android_tools
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Outils Android
+echo.
+echo 1 - ADB
+echo 2 - Scrcpy
+echo 3 - Odin 3
+echo 4 - SamFwTool
+echo 5 - Pixel Flasher
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p android_choice=■ Sélectionner une option : 
+
+if "%android_choice%"=="0" goto :main_menu
+if "%android_choice%"=="1" goto :install_adb
+if "%android_choice%"=="2" goto :install_scrcpy
+if "%android_choice%"=="3" goto :install_odin3
+if "%android_choice%"=="4" goto :install_samfwtool
+if "%android_choice%"=="5" goto :install_pixelflasher
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :android_tools
+
+:install_adb
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de ADB
+echo.
+set "temp_dir=%temp%\adb_install"
+set "install_dir=C:\Android\adb"
+mkdir "%temp_dir%" 2>nul
+mkdir "%install_dir%" 2>nul
+
+echo - Téléchargement de ADB
+powershell -Command "& { Invoke-WebRequest -Uri 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip?hl=fr' -OutFile '%temp_dir%\adb.zip' }"
+
+echo - Extraction de l'archive
+powershell -Command "& { Expand-Archive -Path '%temp_dir%\adb.zip' -DestinationPath '%install_dir%' -Force }"
+
+echo - Ajout du chemin à la variable PATH
+setx PATH "%PATH%;%install_dir%" /M
+
+echo - Nettoyage des fichiers temporaires
+rmdir /s /q "%temp_dir%"
+
+echo.
+echo ► ADB a été installé avec succès !
+pause
+goto :android_tools
+
+:install_scrcpy
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Scrcpy
+echo.
+set "temp_dir=%temp%\scrcpy_install"
+set "install_dir=C:\Android\scrcpy"
+mkdir "%temp_dir%" 2>nul
+mkdir "%install_dir%" 2>nul
+
+echo - Téléchargement de Scrcpy
+powershell -Command "& { $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/Genymobile/scrcpy/releases/latest'; $asset = $releases.assets | Where-Object { $_.name -like '*win64.zip' } | Select-Object -First 1; Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%temp_dir%\scrcpy.zip' }"
+
+echo - Extraction de l'archive
+powershell -Command "& { Expand-Archive -Path '%temp_dir%\scrcpy.zip' -DestinationPath '%install_dir%' -Force }"
+
+echo - Ajout du chemin à la variable PATH
+setx PATH "%PATH%;%install_dir%" /M
+
+echo - Nettoyage des fichiers temporaires
+rmdir /s /q "%temp_dir%"
+
+echo.
+echo ► Scrcpy a été installé avec succès !
+pause
+goto :android_tools
+
+:install_odin3
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Odin 3
+echo.
+set "temp_dir=%temp%\odin3_install"
+set "install_dir=C:\Android\Odin3"
+mkdir "%temp_dir%" 2>nul
+mkdir "%install_dir%" 2>nul
+
+echo - Téléchargement de Odin 3
+powershell -Command "& { Invoke-WebRequest -Uri 'https://samfw.com/Odin/Samfw.com_Odin3_v3.14.4.zip' -OutFile '%temp_dir%\odin3.zip' }"
+
+echo - Extraction de l'archive
+powershell -Command "& { Expand-Archive -Path '%temp_dir%\odin3.zip' -DestinationPath '%temp_dir%\extracted' -Force }"
+
+echo - Déplacement des fichiers
+move "%temp_dir%\extracted\*" "%install_dir%"
+
+echo - Nettoyage des fichiers temporaires
+rmdir /s /q "%temp_dir%"
+
+echo.
+echo ► Odin 3 a été installé avec succès !
+pause
+goto :android_tools
+
+:install_samfwtool
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de SamFwTool
+echo.
+set "temp_dir=%temp%\samfwtool_install"
+mkdir "%temp_dir%" 2>nul
+
+echo - Téléchargement de SamFwTool
+powershell -Command "& { Invoke-WebRequest -Uri 'https://samfw.com/SamFwToolSetup_v4.9.zip' -OutFile '%temp_dir%\samfwtool.zip' }"
+
+echo - Extraction de l'archive
+powershell -Command "& { Expand-Archive -Path '%temp_dir%\samfwtool.zip' -DestinationPath '%temp_dir%\extracted' -Force }"
+
+echo - Installation silencieuse
+start /wait "" "%temp_dir%\extracted\SamFwToolSetup.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+
+echo - Nettoyage des fichiers temporaires
+rmdir /s /q "%temp_dir%"
+
+echo.
+echo ► SamFwTool a été installé avec succès !
+pause
+goto :android_tools
+
+:install_pixelflasher
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Pixel Flasher
+echo.
+set "install_dir=C:\Android\PixelFlasher"
+mkdir "%install_dir%" 2>nul
+
+echo - Téléchargement de Pixel Flasher
+powershell -Command "& { $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/badabing2005/PixelFlasher/releases/latest'; $asset = $releases.assets | Where-Object { $_.name -like '*.exe' } | Select-Object -First 1; Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%install_dir%\PixelFlasher.exe' }"
+
+echo.
+echo ► Pixel Flasher a été installé avec succès !
+pause
+goto :android_tools
+
+:optimize_windows
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Optimiser Windows
+echo.
+echo 1 - WinUtil
+echo 2 - Optimizer
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p optimize_choice=■ Sélectionner une option : 
+
+if "%optimize_choice%"=="0" goto :main_menu
+if "%optimize_choice%"=="1" goto :winutil_menu
+if "%optimize_choice%"=="2" goto :install_optimizer
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :optimize_windows
+
+:install_optimizer
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation et exécution d'Optimizer
+echo.
+
+set "install_dir=C:\Program Files\Optimizer"
+mkdir "%install_dir%" 2>nul
+
+echo - Téléchargement de la dernière version d'Optimizer
+powershell -Command "& { $latestRelease = (Invoke-WebRequest -Uri 'https://api.github.com/repos/hellzerg/optimizer/releases/latest' | ConvertFrom-Json); $downloadUrl = $latestRelease.assets | Where-Object { $_.name -like '*.exe' } | Select-Object -ExpandProperty browser_download_url; Invoke-WebRequest -Uri $downloadUrl -OutFile '%install_dir%\Optimizer.exe' }"
+
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Optimizer téléchargé avec succès
+    echo.
+    echo - Exécution d'Optimizer
+    start "" "%install_dir%\Optimizer.exe"
+) else (
+    echo x Échec du téléchargement d'Optimizer
+)
+
+echo.
+pause
+goto :optimize_windows
 
 :winutil_menu
 cls
@@ -407,7 +619,7 @@ goto :windows_features
 powershell -Command "irm https://get.activated.win | iex"
 goto :main_menu
 
-:install_programmes
+:install_programs
 cls
 echo %ligne1%
 echo %ligne2%
@@ -476,7 +688,7 @@ for %%i in (%choix%) do (
 
 echo.
 pause
-goto :install_programmes
+goto :install_programs
 
 :install_all_programs
 cls
@@ -644,7 +856,7 @@ taskkill /F /IM explorer.exe
 start explorer.exe
 goto :main_menu
 
-:install_microsoft_store
+:install_store
 cls
 echo %ligne1%
 echo %ligne2%
@@ -691,7 +903,7 @@ if %errorlevel% equ 0 (
     goto :main_menu
 )
 
-:install_microsoft_office
+:install_office
 cls
 echo %ligne1%
 echo %ligne2%

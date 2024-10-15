@@ -32,6 +32,7 @@ PowerToys|Microsoft.PowerToys|winget
 VLC|VideoLAN.VLC|winget
 Visual Studio Code|Microsoft.VisualStudioCode|winget
 Windows Calculator|9WZDNCRFHVN5|winget
+Windows Media Player|9WZDNCRFJ3PT|winget
 Windows Notepad|9MSMLRH6LZF3|winget
 Windows Terminal|Microsoft.WindowsTerminal|winget
 WindowGrid|windowgrid|choco
