@@ -437,7 +437,7 @@ echo ■ Sélection des programmes à installer
 echo.
 
 if not exist "%ORIGINAL_PATH%packages.txt" (
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
 )
 
 set "counter=1"
@@ -561,7 +561,7 @@ if not exist "C:\Windows\Blank.ico" (
     if exist "%ORIGINAL_PATH%Blank.ico" (
         copy "%ORIGINAL_PATH%Blank.ico" "C:\Windows\Blank.ico" /Y
     ) else (
-        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
+        powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/Blank.ico' -OutFile 'C:\Windows\Blank.ico'"
     )
 )
 
@@ -685,14 +685,14 @@ if %errorlevel% equ 0 (
 
     echo - Tlchargement des fichiers ncessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
+        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
 
     echo - Installation de Microsoft Store et ses composants
     powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
@@ -766,7 +766,7 @@ mkdir "%extractFolder%" 2>nul
 
 echo - Téléchargement du fond d'écran
 start /wait bitsadmin /transfer WallpaperDownload /dynamic /priority high ^
-    "https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/Wallpaper.zip" ^
+    "https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/Wallpaper.zip" ^
     "%tempFolder%\Wallpaper.zip"
 
 if %errorlevel% equ 0 (
@@ -825,7 +825,7 @@ goto :main_menu
 
 :install_fonts
 set "tempFolder=%TEMP%\Font"
-set "fontUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/MesloLGLNerdFont.zip"
+set "fontUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip"
 set "fontZip=%tempFolder%\MesloLGLNerdFont.zip"
 set "extractFolder=%tempFolder%\MesloLGLNerdFont"
 
@@ -855,7 +855,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointMan
 
 winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
 
 if %errorlevel% equ 0 (
     echo ► Profil PowerShell configuré avec succès
@@ -867,7 +867,7 @@ goto :eof
 :configure_doskey
 if not exist "%userprofile%\.config\doskey" mkdir "%userprofile%\.config\doskey"
 
-powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/.doskey' -OutFile '%userprofile%\.config\doskey\.doskey' }"
+powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/.doskey' -OutFile '%userprofile%\.config\doskey\.doskey' }"
 
 if %errorlevel% equ 0 (
     reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f >nul 2>&1
@@ -888,7 +888,7 @@ set "clinkDestination=%userprofile%\AppData\Local\clink"
 
 mkdir "%tempFolder%" 2>nul
 
-powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/clink.zip' -OutFile '%clinkZip%' }"
+powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/clink.zip' -OutFile '%clinkZip%' }"
 
 if %errorlevel% equ 0 (
     powershell -Command "& { Expand-Archive -Path '%clinkZip%' -DestinationPath '%clinkDestination%' -Force }"
