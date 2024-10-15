@@ -10,7 +10,7 @@ set "ligne3=============================================="
 if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%~dp0"
 
 
-:: Vérifier les privilèges administrateur et relancer si nécessaire
+:: V�rifier les privil�ges administrateur et relancer si n�cessaire
 net session >nul 2>&1
 if %errorLevel% == 0 (
     goto :admin_ok
@@ -39,7 +39,7 @@ if "%policy_status%"=="Modified" (
     echo.
 )
 
-:: Définir la taille de la fenêtre
+:: D�finir la taille de la fen�tre
 :: mode con: cols=80 lines=30
 
 cls
@@ -56,7 +56,7 @@ if %errorlevel% equ 0 (
     goto :check_windows_terminal
 ) else (
     echo x Winget n'est pas installé sur votre système
-    goto :install_winget
+    goto :packages_manager
 )
 
 :check_windows_terminal
@@ -73,15 +73,16 @@ if "%WT_SESSION%"=="" (
 )
 goto :main_menu
 
-:install_winget
+:packages_manager
 cls
 echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ Installation de Winget
+echo ■ Installation des gestionnaires de paquets
 echo.
 
+echo - Installation de Winget
 set "tempFolder=%TEMP%\WinGetInstall"
 if not exist "%tempFolder%" mkdir "%tempFolder%" >nul 2>&1
 
@@ -111,6 +112,21 @@ rmdir /s /q "%tempFolder%" >nul 2>&1
 echo.
 echo ► Winget a été installé avec succès !
 call :version_winget
+
+echo.
+echo - Installation de Chocolatey
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+
+if %errorlevel% equ 0 (
+    echo.
+    echo ► Chocolatey a été installé avec succès !
+    echo.
+    choco --version
+) else (
+    echo.
+    echo x Échec de l'installation de Chocolatey
+)
+
 echo.
 pause
 goto :install_windows_terminal
@@ -157,6 +173,8 @@ echo 7 - Paramètres Windows
 echo 8 - Nettoyage de Windows
 echo 9 - Installer la police Meslo LGL Nerd
 echo 10 - Configuration du profil PowerShell
+echo 11 - Configuration des alias Doskey
+echo 12 - Installation de Clink
 echo.
 echo 0 - Quitter
 echo.
@@ -174,6 +192,8 @@ if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :clean_windows
 if "%choix%"=="9" goto :install_fonts
 if "%choix%"=="10" goto :configure_powershell_profile
+if "%choix%"=="11" goto :configure_doskey
+if "%choix%"=="12" goto :install_clink
 if "%choix%"=="0" goto :end_of_script
 
 echo.
@@ -234,7 +254,7 @@ goto :main_menu
 :create_winutil_shortcut
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $desktopPath = [Environment]::GetFolderPath('Desktop'); $shortcutPath = Join-Path $desktopPath 'winutil.lnk'; $shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut($shortcutPath); $shortcut.TargetPath = 'powershell.exe'; $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -Command ""irm https://christitus.com/win | iex""'; $shortcut.WorkingDirectory = $env:USERPROFILE; $winutilDir = Join-Path $env:LOCALAPPDATA 'WinUtil'; $iconPath = Join-Path $winutilDir 'cttlogo.ico'; if (-not (Test-Path $iconPath)) { New-Item -ItemType Directory -Force -Path $winutilDir | Out-Null; Invoke-WebRequest -Uri 'https://christitus.com/images/logo-full.ico' -OutFile $iconPath }; if (Test-Path $iconPath) { $shortcut.IconLocation = $iconPath }; $shortcut.Save(); $bytes = [System.IO.File]::ReadAllBytes($shortcutPath); $bytes[0x15] = $bytes[0x15] -bor 0x20; [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)}"
 if %errorlevel% equ 0 (
-    echo ► Raccourci WinUtil créé sur le bureau
+    echo ► Raccourci WinUtil cré sur le bureau
 ) else (
     echo x Échec de la création du raccourci WinUtil
 )
@@ -273,7 +293,7 @@ echo.
 echo ■ Paramètres Windows
 echo.
 echo 1 - Registre Windows
-echo 2 - Fonds d'écran
+echo 2 - Fond d'écran
 echo.
 echo 0 - Retour au menu principal
 echo.
@@ -349,13 +369,13 @@ echo.
 echo ■ Installation de Windows Sandbox
 DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► Windows Sandbox a été installé avec succès
+    echo ► Windows Sandbox a �t� install� avec succ�s
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) elseif %errorlevel% equ 3010 (
     echo ► Windows Sandbox a été installé avec succès
     echo.
-    echo Un redémarrage sera nécessaire pour finaliser l'installation
+    echo Un red�marrage sera n�cessaire pour finaliser l'installation
 ) else (
     echo x Échec de l'installation de Windows Sandbox
 )
@@ -372,7 +392,7 @@ echo.
 echo ■ Installation de .NET Framework 3.5
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► .NET Framework 3.5 a été installé avec succès
+    echo ► .NET Framework 3.5 a �t� install� avec succ�s
     echo.
     echo Un redémarrage peut être nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
@@ -396,7 +416,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ Sélection des programmes à installer
+echo ? S�lection des programmes � installer
 echo.
 
 if not exist "%ORIGINAL_PATH%packages.txt" (
@@ -404,65 +424,52 @@ if not exist "%ORIGINAL_PATH%packages.txt" (
 )
 
 set "counter=1"
-for /f "tokens=1,2 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
-    set "program[!counter!]=%%a|%%b"
+for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
+    set "program[!counter!]=%%a|%%b|%%c"
     echo !counter! - %%a
     set /a "counter+=1"
 )
 
-set "program[!counter!]=Cleanmgr+|CUSTOM"
-echo !counter! - Cleanmgr+
-
-set /a "total_programs=counter"
+set /a "total_programs=counter-1"
 echo.
 echo 0 - Retour au menu principal
 echo A - Installer tous les programmes
 echo.
 echo %ligne1%
 echo.
-set /p choix=■ Saisir les numéros (séparés par des espaces) : 
+set /p choix=? Saisir les numéros (séparés par des espaces) : 
 
 if "%choix%"=="0" goto :main_menu
 if /i "%choix%"=="A" goto :install_all_programs
 
 for %%i in (%choix%) do (
     if defined program[%%i] (
-        for /f "tokens=1,2 delims=|" %%a in ("!program[%%i]!") do (
+        for /f "tokens=1,2,3 delims=|" %%a in ("!program[%%i]!") do (
             set "name=%%a"
             set "id=%%b"
+            set "source=%%c"
         )
-        if "!id!"=="CUSTOM" (
-            if "!name!"=="Cleanmgr+" (
-                cls
-                echo %ligne1%
-                echo %ligne2%
-                echo %ligne3%
-                echo.
-                echo - Installation de Cleanmgr+
-                powershell -Command "& {$tempFile = [System.IO.Path]::GetTempFileName() + '.zip'; Invoke-WebRequest -Uri 'https://github.com/builtbybel/CleanmgrPlus/releases/download/1.50.1300/cleanmgrplus.zip' -OutFile $tempFile -ErrorAction SilentlyContinue | Out-Null; New-Item -ItemType Directory -Path 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; Expand-Archive -Path $tempFile -DestinationPath 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', 'Cleanmgr+.lnk')); $Shortcut.TargetPath = 'C:\Program Files\Cleanmgr+\Cleanmgr+.exe'; $Shortcut.Save(); $Shell = New-Object -ComObject Shell.Application; $Folder = $Shell.Namespace('C:\Program Files\Cleanmgr+'); $Item = $Folder.ParseName('Cleanmgr+.exe'); if ($Item) { $Item.InvokeVerb('pin to start') }; Remove-Item $tempFile -Force -ErrorAction SilentlyContinue | Out-Null}" 2>nul
-                if !errorlevel! equ 0 (
-                    echo.
-                    echo ► Installation de Cleanmgr+ réussie
-                ) else (
-                    echo.
-                    echo x Échec de l'installation de Cleanmgr+
-                )
-            )
-        ) else (
-            cls
-            echo %ligne1%
-            echo %ligne2%
-            echo %ligne3%
-            echo.
-            echo - Installation de !name!
+        cls
+        echo %ligne1%
+        echo %ligne2%
+        echo %ligne3%
+        echo.
+        echo - Installation de !name!
+        if "!source!"=="winget" (
             winget install !id! --silent --accept-source-agreements --accept-package-agreements
-            if !errorlevel! equ 0 (
-                echo.
-                echo ► Installation de !name! réussie
-            ) else (
-                echo.
-                echo x Échec de l'installation de !name!
-            )
+        ) else if "!source!"=="choco" (
+            choco install !id! -y -f
+        ) else if "!source!"=="custom" (
+            call :install_custom_program "!name!" "!id!"
+        ) else (
+            echo Source inconnue pour !name!
+        )
+        if !errorlevel! equ 0 (
+            echo.
+            echo ? Installation de !name! réussie
+        ) else (
+            echo.
+            echo x Échec de l'installation de !name!
         )
     ) else (
         echo.
@@ -480,30 +487,46 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ Installation de tous les programmes
-for /f "tokens=1,2 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
+echo ? Installation de tous les programmes
+for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
     echo.
     echo - Installation de %%a
-    winget install %%b --silent --accept-source-agreements --accept-package-agreements
+    if "%%c"=="winget" (
+        winget install %%b --silent --accept-source-agreements --accept-package-agreements
+    ) else if "%%c"=="choco" (
+        choco install %%b -y -f
+    ) else if "%%c"=="custom" (
+        call :install_custom_program "%%a" "%%b"
+    ) else (
+        echo Source inconnue pour %%a
+    )
     if !errorlevel! equ 0 (
-        echo ► Installation de %%a réussie
+        echo ? Installation de %%a réussie
     ) else (
         echo x Échec de l'installation de %%a
     )
 )
 
 echo.
-echo - Installation de Cleanmgr+
-powershell -Command "Invoke-WebRequest -Uri 'https://github.com/builtbybel/CleanmgrPlus/releases/download/1.50.1300/cleanmgrplus.zip' -OutFile '$env:TEMP\cleanmgrplus.zip' -ErrorAction SilentlyContinue | Out-Null; New-Item -ItemType Directory -Path 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; Expand-Archive -Path '$env:TEMP\cleanmgrplus.zip' -DestinationPath 'C:\Program Files\Cleanmgr+' -Force -ErrorAction SilentlyContinue | Out-Null; $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut('$env:USERPROFILE\Desktop\Cleanmgr+.lnk'); $Shortcut.TargetPath = 'C:\Program Files\Cleanmgr+\Cleanmgr+.exe'; $Shortcut.Save(); $Shell = New-Object -ComObject Shell.Application; $Folder = $Shell.Namespace('C:\Program Files\Cleanmgr+'); $Item = $Folder.ParseName('Cleanmgr+.exe'); $Item.InvokeVerb('pin to start'); Remove-Item '$env:TEMP\cleanmgrplus.zip' -Force -ErrorAction SilentlyContinue | Out-Null"
-if !errorlevel! equ 0 (
-    echo ► Installation de Cleanmgr+ réussie
-) else (
-    echo x Échec de l'installation de Cleanmgr+
-)
-
-echo.
 pause
 goto :main_menu
+
+:install_custom_program
+set "program_name=%~1"
+set "program_url=%~2"
+set "install_dir=C:\Program Files\%program_name%"
+
+echo - Installation de %program_name%
+mkdir "%install_dir%" 2>nul
+powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%install_dir%\%program_name%.exe' }"
+if %errorlevel% equ 0 (
+    echo - Création du raccourci sur le bureau
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = '%install_dir%\%program_name%.exe'; $Shortcut.Save() }"
+    echo ► Installation de %program_name% réussie
+) else (
+    echo x Échec de l'installation de %program_name%
+)
+goto :eof
 
 :apply_windows_settings
 cls
@@ -595,7 +618,7 @@ echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Expl
 echo "NoRecentDocsHistory"=dword:00000001
 echo.
 echo ;Start_TrackDocs
-echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 echo "Start_TrackDocs"=dword:00000000
 echo.
 echo ;Disable Subscribed Content
@@ -643,7 +666,7 @@ if %errorlevel% equ 0 (
     set "tempFolder=%TEMP%\MicrosoftStoreInstall"
     mkdir "%tempFolder%" 2>nul
 
-    echo - Téléchargement des fichiers nécessaires
+    echo - T�l�chargement des fichiers n�cessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
@@ -733,7 +756,7 @@ if %errorlevel% equ 0 (
     echo - Extraction du fond d'écran
     powershell -Command "Expand-Archive -Path '%tempFolder%\Wallpaper.zip' -DestinationPath '%extractFolder%' -Force"
     if %errorlevel% equ 0 (
-        echo - Configuration du fond d'écran
+        echo - Configuration du fond d'�cran
         reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v WallPaper /t REG_SZ /d "C:\Users\%username%\Pictures\Wallpapers\purple.png" /f
         if %errorlevel% equ 0 (
             echo ► Fond d'écran installé avec succès
@@ -813,7 +836,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointMan
 echo - Installation de fzf
 winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
 
-echo - Téléchargement du profil PowerShell
+echo - T�l�chargement du profil PowerShell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
 
 if %errorlevel% equ 0 (
@@ -822,6 +845,80 @@ if %errorlevel% equ 0 (
 ) else (
     echo.
     echo x Échec de la configuration du profil PowerShell
+)
+
+echo.
+pause
+goto :main_menu
+
+:configure_doskey
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration des alias Doskey
+echo.
+
+echo - Création de répertoire
+if not exist "%userprofile%\.config\doskey" mkdir "%userprofile%\.config\doskey"
+
+echo - Téléchargement de fichier
+powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/.doskey' -OutFile '%userprofile%\.config\doskey\.doskey' }"
+
+if %errorlevel% equ 0 (
+    echo - Modification du registre
+    reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f
+    if %errorlevel% equ 0 (
+        echo.
+        echo ► Configuration des alias Doskey réussie
+    ) else (
+        echo.
+        echo x Échec de modification du registre
+    )
+) else (
+    echo.
+    echo x Échec du téléchargement de fichier
+)
+
+echo.
+pause
+goto :main_menu
+
+:install_clink
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Clink
+echo.
+
+set "tempFolder=%TEMP%\ClinkInstall"
+set "clinkZip=%tempFolder%\clink.zip"
+set "clinkDestination=%userprofile%\AppData\Local\clink"
+
+echo - Création du répertoire temporaire
+mkdir "%tempFolder%" 2>nul
+
+echo - Téléchargement de Clink
+powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/clink.zip' -OutFile '%clinkZip%' }"
+
+if %errorlevel% equ 0 (
+    echo - Extraction des fichiers
+    powershell -Command "& { Expand-Archive -Path '%clinkZip%' -DestinationPath '%clinkDestination%' -Force }"
+    if %errorlevel% equ 0 (
+        echo - Nettoyage des fichiers temporaires
+        rmdir /s /q "%tempFolder%" 2>nul
+        echo.
+        echo ► Clink a été installé avec succès dans %clinkDestination%
+    ) else (
+        echo.
+        echo x Échec de l'extraction des fichiers Clink
+    )
+) else (
+    echo.
+    echo x Échec du téléchargement de Clink
 )
 
 echo.
