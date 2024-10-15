@@ -336,6 +336,7 @@ echo.
 echo 1 - Hyper-V
 echo 2 - Sandbox
 echo 3 - .NET Framework 3.5
+echo 4 - Sous-système Windows pour Linux
 echo.
 echo 0 - Retour au menu principal
 echo.
@@ -345,6 +346,7 @@ if "%feature_choice%"=="0" goto :main_menu
 if "%feature_choice%"=="1" goto :enable_hyperv
 if "%feature_choice%"=="2" goto :enable_sandbox
 if "%feature_choice%"=="3" goto :enable_dotnet35
+if "%feature_choice%"=="4" goto :enable_wsl
 
 echo.
 echo Option invalide. Veuillez réessayer
@@ -418,6 +420,32 @@ if %errorlevel% equ 0 (
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo x Échec de l'installation de .NET Framework 3.5
+)
+echo.
+pause
+goto :windows_features
+
+:enable_wsl
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation du Sous-système Windows pour Linux (WSL)
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+if %errorlevel% equ 0 (
+    echo.
+    echo ► WSL a été activé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) else if %errorlevel% equ 3010 (
+    echo.
+    echo ► WSL a été activé avec succès
+    echo.
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
+) else (
+    echo.
+    echo x Échec de l'activation de WSL
 )
 echo.
 pause
@@ -803,59 +831,38 @@ echo.
 echo ■ Configuration du Terminal
 echo.
 
-echo - Installation de la police Meslo LGL Nerd
 call :install_fonts
 
 echo.
-echo - Configuration du profil PowerShell
 call :configure_powershell_profile
 
 echo.
-echo - Configuration des alias Doskey
 call :configure_doskey
 
 echo.
-echo - Configuration de Clink
 call :configure_clink
 
 echo.
-echo ► Configuration du Terminal terminée
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$settingsPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/settings.json' -OutFile $settingsPath"
+
+if %errorlevel% equ 0 (
+    echo ► Configuration de Windows Terminal terminée
+) else (
+    echo x Échec de la configuration de Windows Terminal
+)
+
+echo.
 pause
 goto :main_menu
 
 :install_fonts
-set "tempFolder=%TEMP%\Font"
-set "fontUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip"
-set "fontZip=%tempFolder%\MesloLGLNerdFont.zip"
-set "extractFolder=%tempFolder%\MesloLGLNerdFont"
-
-mkdir "%tempFolder%" 2>nul
-mkdir "%extractFolder%" 2>nul
-
-powershell -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%fontUrl%' -OutFile '%fontZip%' }"
-
-if %errorlevel% equ 0 (
-    powershell -Command "Expand-Archive -Path '%fontZip%' -DestinationPath '%extractFolder%' -Force"
-    if %errorlevel% equ 0 (
-        for %%F in ("%extractFolder%\*.ttf") do (
-            powershell -Command "& { Add-Type -AssemblyName System.Drawing; $fontCollection = New-Object System.Drawing.Text.PrivateFontCollection; $fontCollection.AddFontFile('%%F'); $fontName = $fontCollection.Families[0].Name; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere('%%F', 0x10); }"
-        )
-        rmdir /s /q "%extractFolder%" 2>nul
-        echo ► Police Meslo LGL Nerd installée avec succès
-    ) else (
-        echo x Échec de l'extraction des polices
-    )
-) else (
-    echo Échec du téléchargement des polices
-)
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$fontPath = '%userprofile%\AppData\Local\Microsoft\Windows\Fonts\MesloLGLNerdFont-Regular.ttf'; if (-not (Test-Path $fontPath)) { $tempFolder = Join-Path $env:TEMP 'Font'; $fontUrl = 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip'; $fontZip = Join-Path $tempFolder 'MesloLGLNerdFont.zip'; $extractFolder = Join-Path $tempFolder 'MesloLGLNerdFont'; New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null; New-Item -ItemType Directory -Force -Path $extractFolder | Out-Null; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip; if (Test-Path $fontZip) { Expand-Archive -Path $fontZip -DestinationPath $extractFolder -Force; Get-ChildItem -Path $extractFolder -Filter '*.ttf' | ForEach-Object { $fontName = $_.Name; $fontPath = $_.FullName; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere($fontPath, 0x10) }; Remove-Item -Path $extractFolder -Recurse -Force; Write-Host '► Police Meslo LGL Nerd installée avec succès' } else { Write-Host 'x Échec du téléchargement des polices' } } else { Write-Host '► La police Meslo LGL Nerd est déjà installée' }"
 goto :eof
 
 :configure_powershell_profile
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Get-Module -ListAvailable -Name PowerShellGet)) { Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber }; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module oh-my-posh -Scope CurrentUser -Force -AllowClobber; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profileFile = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'; if (Test-Path $profileFile) { Write-Host 'Ecraser le profil Powershell actuel ? (o/n)' -NoNewline; $response = Read-Host; if ($response -eq 'o') { $overwrite = $true } else { $overwrite = $false } } else { $overwrite = $true }; if ($overwrite) { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Get-Module -ListAvailable -Name PowerShellGet)) { Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber }; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module oh-my-posh -Scope CurrentUser -Force -AllowClobber; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber; $profilePath = Split-Path $profileFile; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile; Write-Host '► Profil PowerShell configure avec succes' } else { Write-Host '► Configuration du profil PowerShell annulee' } }"
 
 winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
 
 if %errorlevel% equ 0 (
     echo ► Profil PowerShell configuré avec succès
