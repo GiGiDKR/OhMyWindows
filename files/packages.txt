@@ -7,6 +7,7 @@ Everything|voidtools.Everything|winget
 ExplorerPatcher|valinet.ExplorerPatcher.Prerelease|winget
 GeForce Now|Nvidia.GeForceNow|winget
 Git|Git.Git|winget
+GitHub CLI|GitHub.cli|winget
 GitHub Desktop|GitHub.GitHubDesktop|winget
 Glary Utilities|Glarysoft.GlaryUtilities|winget
 Google Chrome|Google.Chrome|winget

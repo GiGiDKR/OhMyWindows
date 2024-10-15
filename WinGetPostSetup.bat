@@ -170,192 +170,35 @@ echo 3 - Installation Microsoft Office
 echo 4 - Fonctionnalités Windows
 echo 5 - Activation de Windows / Office
 echo 6 - Optimiser Windows
-echo 7 - Outils Android
+echo 7 - Paramètres Windows
+echo 8 - Nettoyage de Windows
+echo 9 - Configuration du Terminal
+echo 10 - Mise à jour des programmes
+echo 11 - Outils Android
 echo.
 echo 0 - Quitter
 echo.
-set /p main_choice=■ Sélectionner une option : 
+echo %ligne1%
+echo.
+set /p choix=■ Sélectionner une option : 
 
-if "%main_choice%"=="0" goto :end_of_script
-if "%main_choice%"=="1" goto :install_programs
-if "%main_choice%"=="2" goto :install_store
-if "%main_choice%"=="3" goto :install_office
-if "%main_choice%"=="4" goto :windows_features
-if "%main_choice%"=="5" goto :activate_windows
-if "%main_choice%"=="6" goto :optimize_windows
-if "%main_choice%"=="7" goto :android_tools
+if "%choix%"=="1" goto :install_programmes
+if "%choix%"=="2" goto :install_microsoft_store
+if "%choix%"=="3" goto :install_microsoft_office
+if "%choix%"=="4" goto :windows_features
+if "%choix%"=="5" goto :activate_windows
+if "%choix%"=="6" goto :optimize_windows
+if "%choix%"=="7" goto :windows_settings_menu
+if "%choix%"=="8" goto :clean_windows
+if "%choix%"=="9" goto :configure_terminal
+if "%choix%"=="10" goto :upgrade_programs
+if "%choix%"=="11" goto :android_tools
+if "%choix%"=="0" goto :end_of_script
 
 echo.
 echo Option invalide. Veuillez réessayer.
 pause
 goto :main_menu
-
-:android_tools
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Outils Android
-echo.
-echo 1 - ADB
-echo 2 - Scrcpy
-echo 3 - Odin 3
-echo 4 - SamFwTool
-echo 5 - Pixel Flasher
-echo.
-echo 0 - Retour au menu principal
-echo.
-set /p android_choice=■ Sélectionner une option : 
-
-if "%android_choice%"=="0" goto :main_menu
-if "%android_choice%"=="1" goto :install_adb
-if "%android_choice%"=="2" goto :install_scrcpy
-if "%android_choice%"=="3" goto :install_odin3
-if "%android_choice%"=="4" goto :install_samfwtool
-if "%android_choice%"=="5" goto :install_pixelflasher
-
-echo.
-echo Option invalide. Veuillez réessayer.
-pause
-goto :android_tools
-
-:install_adb
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de ADB
-echo.
-set "temp_dir=%temp%\adb_install"
-set "install_dir=C:\Android\adb"
-mkdir "%temp_dir%" 2>nul
-mkdir "%install_dir%" 2>nul
-
-echo - Téléchargement de ADB
-powershell -Command "& { Invoke-WebRequest -Uri 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip?hl=fr' -OutFile '%temp_dir%\adb.zip' }"
-
-echo - Extraction de l'archive
-powershell -Command "& { Expand-Archive -Path '%temp_dir%\adb.zip' -DestinationPath '%install_dir%' -Force }"
-
-echo - Ajout du chemin à la variable PATH
-setx PATH "%PATH%;%install_dir%" /M
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%temp_dir%"
-
-echo.
-echo ► ADB a été installé avec succès !
-pause
-goto :android_tools
-
-:install_scrcpy
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Scrcpy
-echo.
-set "temp_dir=%temp%\scrcpy_install"
-set "install_dir=C:\Android\scrcpy"
-mkdir "%temp_dir%" 2>nul
-mkdir "%install_dir%" 2>nul
-
-echo - Téléchargement de Scrcpy
-powershell -Command "& { $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/Genymobile/scrcpy/releases/latest'; $asset = $releases.assets | Where-Object { $_.name -like '*win64.zip' } | Select-Object -First 1; Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%temp_dir%\scrcpy.zip' }"
-
-echo - Extraction de l'archive
-powershell -Command "& { Expand-Archive -Path '%temp_dir%\scrcpy.zip' -DestinationPath '%install_dir%' -Force }"
-
-echo - Ajout du chemin à la variable PATH
-setx PATH "%PATH%;%install_dir%" /M
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%temp_dir%"
-
-echo.
-echo ► Scrcpy a été installé avec succès !
-pause
-goto :android_tools
-
-:install_odin3
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Odin 3
-echo.
-set "temp_dir=%temp%\odin3_install"
-set "install_dir=C:\Android\Odin3"
-mkdir "%temp_dir%" 2>nul
-mkdir "%install_dir%" 2>nul
-
-echo - Téléchargement de Odin 3
-powershell -Command "& { Invoke-WebRequest -Uri 'https://samfw.com/Odin/Samfw.com_Odin3_v3.14.4.zip' -OutFile '%temp_dir%\odin3.zip' }"
-
-echo - Extraction de l'archive
-powershell -Command "& { Expand-Archive -Path '%temp_dir%\odin3.zip' -DestinationPath '%temp_dir%\extracted' -Force }"
-
-echo - Déplacement des fichiers
-move "%temp_dir%\extracted\*" "%install_dir%"
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%temp_dir%"
-
-echo.
-echo ► Odin 3 a été installé avec succès !
-pause
-goto :android_tools
-
-:install_samfwtool
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de SamFwTool
-echo.
-set "temp_dir=%temp%\samfwtool_install"
-mkdir "%temp_dir%" 2>nul
-
-echo - Téléchargement de SamFwTool
-powershell -Command "& { Invoke-WebRequest -Uri 'https://samfw.com/SamFwToolSetup_v4.9.zip' -OutFile '%temp_dir%\samfwtool.zip' }"
-
-echo - Extraction de l'archive
-powershell -Command "& { Expand-Archive -Path '%temp_dir%\samfwtool.zip' -DestinationPath '%temp_dir%\extracted' -Force }"
-
-echo - Installation silencieuse
-start /wait "" "%temp_dir%\extracted\SamFwToolSetup.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%temp_dir%"
-
-echo.
-echo ► SamFwTool a été installé avec succès !
-pause
-goto :android_tools
-
-:install_pixelflasher
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Pixel Flasher
-echo.
-set "install_dir=C:\Android\PixelFlasher"
-mkdir "%install_dir%" 2>nul
-
-echo - Téléchargement de Pixel Flasher
-powershell -Command "& { $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/badabing2005/PixelFlasher/releases/latest'; $asset = $releases.assets | Where-Object { $_.name -like '*.exe' } | Select-Object -First 1; Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%install_dir%\PixelFlasher.exe' }"
-
-echo.
-echo ► Pixel Flasher a été installé avec succès !
-pause
-goto :android_tools
 
 :optimize_windows
 cls
@@ -393,14 +236,12 @@ echo.
 set "install_dir=C:\Program Files\Optimizer"
 mkdir "%install_dir%" 2>nul
 
-echo - Téléchargement de la dernière version d'Optimizer
+echo - Téléchargement d'Optimizer
 powershell -Command "& { $latestRelease = (Invoke-WebRequest -Uri 'https://api.github.com/repos/hellzerg/optimizer/releases/latest' | ConvertFrom-Json); $downloadUrl = $latestRelease.assets | Where-Object { $_.name -like '*.exe' } | Select-Object -ExpandProperty browser_download_url; Invoke-WebRequest -Uri $downloadUrl -OutFile '%install_dir%\Optimizer.exe' }"
 
 if %errorlevel% equ 0 (
     echo.
     echo ► Optimizer téléchargé avec succès
-    echo.
-    echo - Exécution d'Optimizer
     start "" "%install_dir%\Optimizer.exe"
 ) else (
     echo x Échec du téléchargement d'Optimizer
@@ -416,54 +257,21 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ WinUtil
+echo ■ Installation et exécution de WinUtil
 echo.
-echo 1 - Exécuter WinUtil
-echo 2 - Installer WinUtil
-echo.
-echo 0 - Retour au menu principal
-echo.
-set /p winutil_choice=■ Sélectionner une option : 
 
-if "%winutil_choice%"=="0" goto :main_menu
-if "%winutil_choice%"=="1" goto :run_winutil
-if "%winutil_choice%"=="2" goto :install_winutil
-
-echo.
-echo Option invalide. Veuillez réessayer.
-pause
-goto :winutil_menu
-
-:run_winutil
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Exécution de WinUtil
-echo.
-powershell -Command "irm https://christitus.com/win | iex"
-echo.
-pause
-goto :main_menu
-
-:install_winutil
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de WinUtil
-echo.
 call :create_winutil_shortcut
+
+powershell -Command "irm https://christitus.com/win | iex"
+
 echo.
 pause
 goto :main_menu
 
 :create_winutil_shortcut
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $desktopPath = [Environment]::GetFolderPath('Desktop'); $shortcutPath = Join-Path $desktopPath 'winutil.lnk'; $shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut($shortcutPath); $shortcut.TargetPath = 'powershell.exe'; $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -Command ""irm https://christitus.com/win | iex""'; $shortcut.WorkingDirectory = $env:USERPROFILE; $winutilDir = Join-Path $env:LOCALAPPDATA 'WinUtil'; $iconPath = Join-Path $winutilDir 'cttlogo.ico'; if (-not (Test-Path $iconPath)) { New-Item -ItemType Directory -Force -Path $winutilDir | Out-Null; Invoke-WebRequest -Uri 'https://christitus.com/images/logo-full.ico' -OutFile $iconPath }; if (Test-Path $iconPath) { $shortcut.IconLocation = $iconPath }; $shortcut.Save(); $bytes = [System.IO.File]::ReadAllBytes($shortcutPath); $bytes[0x15] = $bytes[0x15] -bor 0x20; [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)}"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $desktopPath = [Environment]::GetFolderPath('Desktop'); $shortcutPath = Join-Path $desktopPath 'WinUtil.lnk'; $shell = New-Object -ComObject WScript.Shell; $shortcut = $shell.CreateShortcut($shortcutPath); $shortcut.TargetPath = 'powershell.exe'; $shortcut.Arguments = '-NoProfile -ExecutionPolicy Bypass -Command ""irm https://christitus.com/win | iex""'; $shortcut.WorkingDirectory = $env:USERPROFILE; $winutilDir = Join-Path $env:LOCALAPPDATA 'WinUtil'; $iconPath = Join-Path $winutilDir 'cttlogo.ico'; if (-not (Test-Path $iconPath)) { New-Item -ItemType Directory -Force -Path $winutilDir | Out-Null; Invoke-WebRequest -Uri 'https://christitus.com/images/logo-full.ico' -OutFile $iconPath }; if (Test-Path $iconPath) { $shortcut.IconLocation = $iconPath }; $shortcut.Save(); $bytes = [System.IO.File]::ReadAllBytes($shortcutPath); $bytes[0x15] = $bytes[0x15] -bor 0x20; [System.IO.File]::WriteAllBytes($shortcutPath, $bytes)}"
 if %errorlevel% equ 0 (
-    echo ► Raccourci WinUtil cré sur le bureau
+    echo ► Raccourci WinUtil créé sur le bureau
 ) else (
     echo x Échec de la création du raccourci WinUtil
 )
@@ -619,7 +427,7 @@ goto :windows_features
 powershell -Command "irm https://get.activated.win | iex"
 goto :main_menu
 
-:install_programs
+:install_programmes
 cls
 echo %ligne1%
 echo %ligne2%
@@ -688,7 +496,7 @@ for %%i in (%choix%) do (
 
 echo.
 pause
-goto :install_programs
+goto :install_programmes
 
 :install_all_programs
 cls
@@ -856,7 +664,7 @@ taskkill /F /IM explorer.exe
 start explorer.exe
 goto :main_menu
 
-:install_store
+:install_microsoft_store
 cls
 echo %ligne1%
 echo %ligne2%
@@ -903,7 +711,7 @@ if %errorlevel% equ 0 (
     goto :main_menu
 )
 
-:install_office
+:install_microsoft_office
 cls
 echo %ligne1%
 echo %ligne2%
@@ -1123,6 +931,201 @@ if /i "%update_choice%"=="o" (
 echo.
 pause
 goto :main_menu
+
+:android_tools
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Outils Android
+echo.
+echo 1 - ADB
+echo 2 - Scrcpy
+echo 3 - Odin 3
+echo 4 - SamFwTool
+echo 5 - Pixel Flasher
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p android_choice=■ Sélectionner une option : 
+
+if "%android_choice%"=="0" goto :main_menu
+if "%android_choice%"=="1" goto :install_adb
+if "%android_choice%"=="2" goto :install_scrcpy
+if "%android_choice%"=="3" goto :install_odin3
+if "%android_choice%"=="4" goto :install_samfwtool
+if "%android_choice%"=="5" goto :install_pixel_flasher
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :android_tools
+
+:install_adb
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de ADB
+echo.
+set "tempFolder=%TEMP%\ADBInstall"
+set "adbUrl=https://dl.google.com/android/repository/platform-tools-latest-windows.zip?hl=fr"
+set "adbZip=%tempFolder%\platform-tools.zip"
+set "adbDestination=C:\Android\adb"
+
+mkdir "%tempFolder%" 2>nul
+mkdir "C:\Android" 2>nul
+
+powershell -Command "& { Invoke-WebRequest -Uri '%adbUrl%' -OutFile '%adbZip%' } | Out-Null"
+powershell -Command "& { Expand-Archive -Path '%adbZip%' -DestinationPath '%tempFolder%' -Force } | Out-Null"
+
+:: Renommer et déplacer le dossier
+move "%tempFolder%\platform-tools" "%adbDestination%" >nul 2>&1
+
+setx PATH "%PATH%;%adbDestination%" /M >nul 2>&1
+
+if %errorlevel% equ 0 (
+    echo ► ADB install avec succès
+) else (
+    echo x Échec de l'installation de ADB
+)
+
+rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :android_tools
+
+:install_scrcpy
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Scrcpy
+echo.
+set "tempFolder=%TEMP%\ScrcpyInstall"
+set "scrcpyApiUrl=https://api.github.com/repos/Genymobile/scrcpy/releases/latest"
+set "scrcpyZip=%tempFolder%\scrcpy.zip"
+set "scrcpyDestination=C:\Android\scrcpy"
+
+mkdir "%tempFolder%" 2>nul
+mkdir "C:\Android" 2>nul
+
+powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%'; $asset = $latestRelease.assets | Where-Object { $_.name -like 'scrcpy-win64-v*.zip' } | Select-Object -First 1; if ($asset) { if (Test-Path '%scrcpyDestination%') { Write-Host '► Scrcpy est déjà installé' } else { Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%scrcpyZip%'; if (Test-Path '%scrcpyZip%') { Expand-Archive -Path '%scrcpyZip%' -DestinationPath '%tempFolder%' -Force; $extractedFolder = Get-ChildItem -Path '%tempFolder%' -Directory | Select-Object -First 1; if ($extractedFolder) { Move-Item -Path $extractedFolder.FullName -Destination '%scrcpyDestination%' -Force; Write-Host '► Scrcpy installé avec succès' } else { Write-Host 'x Dossier extrait non trouvé' } } else { Write-Host 'x Échec du téléchargement' } } } else { Write-Host 'x Asset non trouvé' } }"
+
+if exist "%scrcpyDestination%" (
+    setx PATH "%PATH%;%scrcpyDestination%" /M >nul 2>&1
+)
+
+rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :android_tools
+
+:install_odin3
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Odin 3
+echo.
+set "tempFolder=%TEMP%\Odin3Install"
+set "odin3Url=https://samfw.com/Odin/Samfw.com_Odin3_v3.14.4.zip"
+set "odin3Zip=%tempFolder%\odin3.zip"
+set "odin3Destination=C:\Android\Odin 3"
+
+mkdir "%tempFolder%" 2>nul
+mkdir "C:\Android" 2>nul
+
+powershell -Command "& { Invoke-WebRequest -Uri '%odin3Url%' -OutFile '%odin3Zip%' | Out-Null }"
+powershell -Command "& { Expand-Archive -Path '%odin3Zip%' -DestinationPath '%tempFolder%' -Force | Out-Null }"
+
+:: Renommer et déplacer le dossier
+move "%tempFolder%\Samfw.com_Odin3_v3.14.4" "%odin3Destination%" >nul 2>&1
+
+if %errorlevel% equ 0 (
+    echo ► Odin 3 installé avec succès
+    
+    :: Création du raccourci sur le bureau
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Odin 3.lnk'); $Shortcut.TargetPath = '%odin3Destination%\Odin3_v3.14.4_Samfw.com.exe'; $Shortcut.WorkingDirectory = '%odin3Destination%'; $Shortcut.Save() }"
+    
+    if %errorlevel% equ 0 (
+        echo ► Raccourci créé sur le bureau
+    ) else (
+        echo x Échec de la création du raccourci
+    )
+) else (
+    echo x Échec de l'installation de Odin 3
+)
+
+rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :android_tools
+
+:install_samfwtool
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de SamFwTool
+echo.
+set "tempFolder=%TEMP%\SamFwToolInstall"
+set "samfwToolUrl=https://samfw.com/SamFwToolSetup_v4.9.zip"
+set "samfwToolZip=%tempFolder%\samfwtool.zip"
+
+mkdir "%tempFolder%" 2>nul
+
+powershell -Command "& { Invoke-WebRequest -Uri '%samfwToolUrl%' -OutFile '%samfwToolZip%' }"
+powershell -Command "& { Expand-Archive -Path '%samfwToolZip%' -DestinationPath '%tempFolder%' -Force }"
+start /wait "" "%tempFolder%\SamFwToolSetup.exe" /VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP-
+
+if %errorlevel% equ 0 (
+    echo ► SamFwTool installé avec succès
+) else (
+    echo x Échec de l'installation de SamFwTool
+)
+
+rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :android_tools
+
+:install_pixel_flasher
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de Pixel Flasher
+echo.
+set "pixelFlasherDestination=C:\Android\Pixel Flasher"
+
+mkdir "%pixelFlasherDestination%" 2>nul
+
+powershell -Command "& { $releases = Invoke-RestMethod -Uri 'https://api.github.com/repos/badabing2005/PixelFlasher/releases/latest'; $asset = $releases.assets | Where-Object { $_.name -like '*.exe' } | Select-Object -First 1; Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%pixelFlasherDestination%\PixelFlasher.exe' }"
+
+if %errorlevel% equ 0 (
+    echo ► Pixel Flasher installé avec succès
+
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Pixel Flasher.lnk'); $Shortcut.TargetPath = '%pixelFlasherDestination%\PixelFlasher.exe'; $Shortcut.Save() }"
+
+    if %errorlevel% equ 0 (
+        echo ► Raccourci créé sur le bureau
+    ) else (
+        echo x Échec de la création du raccourci
+    )
+) else (
+    echo x Échec de l'installation de Pixel Flasher
+)
+
+echo.
+pause
+goto :android_tools
 
 :end_of_script
 cls
