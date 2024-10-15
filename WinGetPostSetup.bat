@@ -10,7 +10,7 @@ set "ligne3=============================================="
 if not defined ORIGINAL_PATH set "ORIGINAL_PATH=%~dp0"
 
 
-:: V�rifier les privil�ges administrateur et relancer si n�cessaire
+:: Vérifier les privilèges administrateur et relancer si nécessaire
 net session >nul 2>&1
 if %errorLevel% == 0 (
     goto :admin_ok
@@ -39,7 +39,7 @@ if "%policy_status%"=="Modified" (
     echo.
 )
 
-:: D�finir la taille de la fen�tre
+:: Définir la taille de la fenêtre
 :: mode con: cols=80 lines=30
 
 cls
@@ -143,15 +143,16 @@ winget install Microsoft.WindowsTerminal --accept-source-agreements --accept-pac
 if %errorlevel% equ 0 (
     echo.
     echo ► Windows Terminal a été installé avec succès !
+    echo.
     echo Redémarrage du script dans Windows Terminal
-    timeout /t 3 >nul
+    timeout /t 2 >nul
     start wt "%~dpnx0"
     exit /b
 ) else (
     echo.
     echo x Échec de l'installation de Windows Terminal
     echo Poursuite du script dans la fenêtre actuelle
-    timeout /t 3 >nul
+    timeout /t 2 >nul
 )
 
 :main_menu
@@ -171,10 +172,8 @@ echo 5 - Activation de Windows / Office
 echo 6 - WinUtil
 echo 7 - Paramètres Windows
 echo 8 - Nettoyage de Windows
-echo 9 - Installer la police Meslo LGL Nerd
-echo 10 - Configuration du profil PowerShell
-echo 11 - Configuration des alias Doskey
-echo 12 - Installation de Clink
+echo 9 - Configuration du Terminal
+echo 10 - Mise à jour des programmes
 echo.
 echo 0 - Quitter
 echo.
@@ -190,10 +189,8 @@ if "%choix%"=="5" goto :activate_windows
 if "%choix%"=="6" goto :winutil_menu
 if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :clean_windows
-if "%choix%"=="9" goto :install_fonts
-if "%choix%"=="10" goto :configure_powershell_profile
-if "%choix%"=="11" goto :configure_doskey
-if "%choix%"=="12" goto :install_clink
+if "%choix%"=="9" goto :configure_terminal
+if "%choix%"=="10" goto :upgrade_programs
 if "%choix%"=="0" goto :end_of_script
 
 echo.
@@ -369,13 +366,13 @@ echo.
 echo ■ Installation de Windows Sandbox
 DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► Windows Sandbox a �t� install� avec succ�s
+    echo ► Windows Sandbox a t install avec succs
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) elseif %errorlevel% equ 3010 (
     echo ► Windows Sandbox a été installé avec succès
     echo.
-    echo Un red�marrage sera n�cessaire pour finaliser l'installation
+    echo Un redmarrage sera ncessaire pour finaliser l'installation
 ) else (
     echo x Échec de l'installation de Windows Sandbox
 )
@@ -392,7 +389,7 @@ echo.
 echo ■ Installation de .NET Framework 3.5
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► .NET Framework 3.5 a �t� install� avec succ�s
+    echo ► .NET Framework 3.5 a t install avec succs
     echo.
     echo Un redémarrage peut être nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
@@ -416,7 +413,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ? S�lection des programmes � installer
+echo ■ Sélection des programmes à installer
 echo.
 
 if not exist "%ORIGINAL_PATH%packages.txt" (
@@ -437,7 +434,7 @@ echo A - Installer tous les programmes
 echo.
 echo %ligne1%
 echo.
-set /p choix=? Saisir les numéros (séparés par des espaces) : 
+set /p choix=■ Saisir les numros (séparés par des espaces) : 
 
 if "%choix%"=="0" goto :main_menu
 if /i "%choix%"=="A" goto :install_all_programs
@@ -466,14 +463,14 @@ for %%i in (%choix%) do (
         )
         if !errorlevel! equ 0 (
             echo.
-            echo ? Installation de !name! réussie
+            echo ► Installation de !name! rssie
         ) else (
             echo.
             echo x Échec de l'installation de !name!
         )
     ) else (
         echo.
-        echo x Le programme numéro %%i n'existe pas dans la liste.
+        echo x Le programme numro %%i n'existe pas dans la liste.
     )
 )
 
@@ -487,7 +484,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ? Installation de tous les programmes
+echo ■ Installation de tous les programmes
 for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
     echo.
     echo - Installation de %%a
@@ -501,7 +498,7 @@ for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
         echo Source inconnue pour %%a
     )
     if !errorlevel! equ 0 (
-        echo ? Installation de %%a réussie
+        echo ► Installation de %%a rssie
     ) else (
         echo x Échec de l'installation de %%a
     )
@@ -520,9 +517,9 @@ echo - Installation de %program_name%
 mkdir "%install_dir%" 2>nul
 powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%install_dir%\%program_name%.exe' }"
 if %errorlevel% equ 0 (
-    echo - Création du raccourci sur le bureau
+    echo - Cration du raccourci sur le bureau
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = '%install_dir%\%program_name%.exe'; $Shortcut.Save() }"
-    echo ► Installation de %program_name% réussie
+    echo ► Installation de %program_name% rssie
 ) else (
     echo x Échec de l'installation de %program_name%
 )
@@ -536,7 +533,7 @@ echo %ligne3%
 echo.
 echo ■ Application des paramètres Windows
 echo.
-echo ■ Redémarrage de l'explorateur nécessaire
+echo - Redémarrage de l'explorateur nécessaire
 echo.
 pause
 
@@ -666,7 +663,7 @@ if %errorlevel% equ 0 (
     set "tempFolder=%TEMP%\MicrosoftStoreInstall"
     mkdir "%tempFolder%" 2>nul
 
-    echo - T�l�chargement des fichiers n�cessaires
+    echo - Tlchargement des fichiers ncessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
@@ -756,7 +753,7 @@ if %errorlevel% equ 0 (
     echo - Extraction du fond d'écran
     powershell -Command "Expand-Archive -Path '%tempFolder%\Wallpaper.zip' -DestinationPath '%extractFolder%' -Force"
     if %errorlevel% equ 0 (
-        echo - Configuration du fond d'�cran
+        echo - Configuration du fond dcran
         reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v WallPaper /t REG_SZ /d "C:\Users\%username%\Pictures\Wallpapers\purple.png" /f
         if %errorlevel% equ 0 (
             echo ► Fond d'écran installé avec succès
@@ -777,15 +774,36 @@ echo.
 pause
 goto :main_menu
 
-:install_fonts
+:configure_terminal
 cls
 echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ Installation de la police Meslo LGL Nerd
+echo ■ Configuration du Terminal
 echo.
 
+echo - Installation de la police Meslo LGL Nerd
+call :install_fonts
+
+echo.
+echo - Configuration du profil PowerShell
+call :configure_powershell_profile
+
+echo.
+echo - Configuration des alias Doskey
+call :configure_doskey
+
+echo.
+echo - Configuration de Clink
+call :configure_clink
+
+echo.
+echo ► Configuration du Terminal terminée
+pause
+goto :main_menu
+
+:install_fonts
 set "tempFolder=%TEMP%\Font"
 set "fontUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/MesloLGLNerdFont.zip"
 set "fontZip=%tempFolder%\MesloLGLNerdFont.zip"
@@ -794,131 +812,100 @@ set "extractFolder=%tempFolder%\MesloLGLNerdFont"
 mkdir "%tempFolder%" 2>nul
 mkdir "%extractFolder%" 2>nul
 
-echo - Téléchargement des polices
 powershell -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri '%fontUrl%' -OutFile '%fontZip%' }"
 
 if %errorlevel% equ 0 (
-    echo - Extraction des polices
     powershell -Command "Expand-Archive -Path '%fontZip%' -DestinationPath '%extractFolder%' -Force"
     if %errorlevel% equ 0 (
-        echo - Installation des polices
         for %%F in ("%extractFolder%\*.ttf") do (
             powershell -Command "& { Add-Type -AssemblyName System.Drawing; $fontCollection = New-Object System.Drawing.Text.PrivateFontCollection; $fontCollection.AddFontFile('%%F'); $fontName = $fontCollection.Families[0].Name; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere('%%F', 0x10); }"
         )
-        echo - Nettoyage des fichiers temporaires
         rmdir /s /q "%extractFolder%" 2>nul
-        echo.
-        echo ► Polices installées avec succès
+        echo ► Police Meslo LGL Nerd installée avec succès
     ) else (
         echo x Échec de l'extraction des polices
     )
 ) else (
-    echo.
-    echo x Échec du téléchargement des polices
+    echo Échec du téléchargement des polices
 )
-
-echo.
-pause
-goto :main_menu
+goto :eof
 
 :configure_powershell_profile
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Configuration du profil PowerShell
-echo.
-
-echo - Installation des modules PowerShell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Get-Module -ListAvailable -Name PowerShellGet)) { Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber }; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module oh-my-posh -Scope CurrentUser -Force -AllowClobber; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber }"
 
-echo - Installation de fzf
 winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
 
-echo - T�l�chargement du profil PowerShell
 powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profilePath = Join-Path $env:USERPROFILE 'Documents\PowerShell'; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; $profileFile = Join-Path $profilePath 'Microsoft.PowerShell_profile.ps1'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile }"
 
 if %errorlevel% equ 0 (
-    echo.
     echo ► Profil PowerShell configuré avec succès
 ) else (
-    echo.
     echo x Échec de la configuration du profil PowerShell
 )
-
-echo.
-pause
-goto :main_menu
+goto :eof
 
 :configure_doskey
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Configuration des alias Doskey
-echo.
-
-echo - Création de répertoire
 if not exist "%userprofile%\.config\doskey" mkdir "%userprofile%\.config\doskey"
 
-echo - Téléchargement de fichier
 powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.2.0/files/.doskey' -OutFile '%userprofile%\.config\doskey\.doskey' }"
 
 if %errorlevel% equ 0 (
-    echo - Modification du registre
-    reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f >nul 2>&1
     if %errorlevel% equ 0 (
-        echo.
-        echo ► Configuration des alias Doskey réussie
+        echo ► Configuration des alias Doskey terminée
     ) else (
-        echo.
         echo x Échec de modification du registre
     )
 ) else (
-    echo.
     echo x Échec du téléchargement de fichier
 )
+goto :eof
 
-echo.
-pause
-goto :main_menu
-
-:install_clink
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Clink
-echo.
-
+:configure_clink
 set "tempFolder=%TEMP%\ClinkInstall"
 set "clinkZip=%tempFolder%\clink.zip"
 set "clinkDestination=%userprofile%\AppData\Local\clink"
 
-echo - Création du répertoire temporaire
 mkdir "%tempFolder%" 2>nul
 
-echo - Téléchargement de Clink
 powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.2.0/files/clink.zip' -OutFile '%clinkZip%' }"
 
 if %errorlevel% equ 0 (
-    echo - Extraction des fichiers
     powershell -Command "& { Expand-Archive -Path '%clinkZip%' -DestinationPath '%clinkDestination%' -Force }"
     if %errorlevel% equ 0 (
-        echo - Nettoyage des fichiers temporaires
         rmdir /s /q "%tempFolder%" 2>nul
-        echo.
-        echo ► Clink a été installé avec succès dans %clinkDestination%
+        echo ► Configuration de Clink terminée
     ) else (
-        echo.
         echo x Échec de l'extraction des fichiers Clink
     )
 ) else (
-    echo.
     echo x Échec du téléchargement de Clink
+)
+goto :eof
+
+:upgrade_programs
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Mise à jour des programmes
+echo.
+
+set /p update_choice=Voulez-vous mettre à jour tous les programmes ? (o/n) 
+
+if /i "%update_choice%"=="o" (
+    echo.
+    echo - Mise à jour des programmes Winget
+    winget upgrade --all
+    echo.
+    echo - Mise à jour des programmes Chocolatey
+    choco upgrade all -y
+    echo.
+    echo ► Mises à jour terminées
+) else (
+    echo.
+    echo x Mises à jour annulées
 )
 
 echo.
