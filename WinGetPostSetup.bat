@@ -833,13 +833,10 @@ echo.
 
 call :install_fonts
 
-echo.
 call :configure_powershell_profile
 
-echo.
 call :configure_doskey
 
-echo.
 call :configure_clink
 
 echo.
@@ -860,15 +857,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "$fontPath = '%userprofil
 goto :eof
 
 :configure_powershell_profile
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { $profileFile = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'; if (Test-Path $profileFile) { Write-Host 'Ecraser le profil Powershell actuel ? (o/n)' -NoNewline; $response = Read-Host; if ($response -eq 'o') { $overwrite = $true } else { $overwrite = $false } } else { $overwrite = $true }; if ($overwrite) { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; if (!(Get-Module -ListAvailable -Name PowerShellGet)) { Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber }; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module oh-my-posh -Scope CurrentUser -Force -AllowClobber; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber; $profilePath = Split-Path $profileFile; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile; Write-Host '► Profil PowerShell configure avec succes' } else { Write-Host '► Configuration du profil PowerShell annulee' } }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber }"
 
-winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$profileFile = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'; $profilePath = Split-Path $profileFile; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile"
 
 if %errorlevel% equ 0 (
-    echo ► Profil PowerShell configuré avec succès
+    echo - Profil PowerShell configuré
 ) else (
     echo x Échec de la configuration du profil PowerShell
 )
+
+winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
+
 goto :eof
 
 :configure_doskey
@@ -879,12 +879,12 @@ powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.c
 if %errorlevel% equ 0 (
     reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f >nul 2>&1
     if %errorlevel% equ 0 (
-        echo ► Configuration des alias Doskey terminée
+        echo - Aias Doskey configurés
     ) else (
-        echo x Échec de modification du registre
+        echo x Échec de la configuration des alias Doskey
     )
 ) else (
-    echo x Échec du téléchargement de fichier
+    echo x Échec du téléchargement des alias Doskey
 )
 goto :eof
 
@@ -901,12 +901,12 @@ if %errorlevel% equ 0 (
     powershell -Command "& { Expand-Archive -Path '%clinkZip%' -DestinationPath '%clinkDestination%' -Force }"
     if %errorlevel% equ 0 (
         rmdir /s /q "%tempFolder%" 2>nul
-        echo ► Configuration de Clink terminée
+        echo - Clink configuré
     ) else (
-        echo x Échec de l'extraction des fichiers Clink
+        echo x Échec de la configuration de Clink
     )
 ) else (
-    echo x Échec du téléchargement de Clink
+    echo x Échec de la configuration de Clink
 )
 goto :eof
 
@@ -1047,8 +1047,8 @@ set "odin3Destination=C:\Android\Odin 3"
 mkdir "%tempFolder%" 2>nul
 mkdir "C:\Android" 2>nul
 
-powershell -Command "& { Invoke-WebRequest -Uri '%odin3Url%' -OutFile '%odin3Zip%' | Out-Null }"
-powershell -Command "& { Expand-Archive -Path '%odin3Zip%' -DestinationPath '%tempFolder%' -Force | Out-Null }"
+powershell -Command "& { Invoke-WebRequest -Uri '%odin3Url%' -OutFile '%odin3Zip%' }"
+powershell -Command "& { Expand-Archive -Path '%odin3Zip%' -DestinationPath '%tempFolder%' -Force }"
 
 :: Renommer et déplacer le dossier
 move "%tempFolder%\Samfw.com_Odin3_v3.14.4" "%odin3Destination%" >nul 2>&1
