@@ -1167,6 +1167,7 @@ echo ■ Configuration des programmes
 echo.
 echo 1 - Nilesoft Shell
 echo 2 - Flow Launcher
+echo 3 - 7-Zip
 echo.
 echo 0 - Retour au menu principal
 echo.
@@ -1175,6 +1176,7 @@ set /p config_choice=■ Sélectionner une option :
 if "%config_choice%"=="0" goto :main_menu
 if "%config_choice%"=="1" goto :configure_nilesoft_shell
 if "%config_choice%"=="2" goto :configure_flow_launcher
+if "%config_choice%"=="3" goto :configure_7zip
 
 echo.
 echo Option invalide. Veuillez réessayer
@@ -1246,6 +1248,43 @@ if %errorlevel% equ 0 (
 )
 
 del "%temp_zip%" 2>nul
+
+echo.
+pause
+goto :configure_programs
+
+:configure_7zip
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration de 7-Zip
+echo.
+
+if not exist "C:\Program Files\7-Zip" (
+    echo x 7-Zip n'est pas installé
+    pause
+    goto :configure_programs
+)
+
+taskkill /F /IM 7zFM.exe 2>nul
+
+set "temp_reg=%TEMP%\7-Zip.reg"
+powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/Config/7-Zip/7-Zip.reg' -OutFile '%temp_reg%' | Out-Null }"
+
+if %errorlevel% equ 0 (
+    regedit /s "%temp_reg%" >nul 2>&1
+    if %errorlevel% equ 0 (
+        echo ► Configuration de 7-Zip terminée
+    ) else (
+        echo x Échec de l'ajout des paramètres au registre
+    )
+) else (
+    echo x Échec du téléchargement du fichier de configuration
+)
+
+del "%temp_reg%" 2>nul
 
 echo.
 pause
