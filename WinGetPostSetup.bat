@@ -164,17 +164,19 @@ echo.
 echo ■ Menu principal
 echo.
 
-echo 1 - Installation de programmes
-echo 2 - Installation de Microsoft Store
+echo 1 - Installation programmes
+echo 2 - Installation Microsoft Store
 echo 3 - Installation Microsoft Office
 echo 4 - Fonctionnalités Windows
-echo 5 - Activation de Windows / Office
+echo 5 - Activation Windows / Office
 echo 6 - Optimiser Windows
 echo 7 - Paramètres Windows
-echo 8 - Nettoyage de Windows
-echo 9 - Configuration du Terminal
-echo 10 - Mise à jour des programmes
-echo 11 - Outils Android
+echo 8 - Nettoyage Windows
+echo 9 - Configuration Terminal
+echo 10 - Configuration programmes
+echo 11 - Mise à jour programmes
+echo 12 - Outils Android
+
 echo.
 echo 0 - Quitter
 echo.
@@ -191,8 +193,9 @@ if "%choix%"=="6" goto :optimize_windows
 if "%choix%"=="7" goto :windows_settings_menu
 if "%choix%"=="8" goto :clean_windows
 if "%choix%"=="9" goto :configure_terminal
-if "%choix%"=="10" goto :upgrade_programs
-if "%choix%"=="11" goto :android_tools
+if "%choix%"=="10" goto :configure_programs
+if "%choix%"=="11" goto :update_programs
+if "%choix%"=="12" goto :android_tools
 if "%choix%"=="0" goto :end_of_script
 
 echo.
@@ -1133,6 +1136,61 @@ if %errorlevel% equ 0 (
 echo.
 pause
 goto :android_tools
+
+:configure_programs
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration des programmes
+echo.
+echo 1 - Nilesoft Shell
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p config_choice=■ Sélectionner une option : 
+
+if "%config_choice%"=="0" goto :main_menu
+if "%config_choice%"=="1" goto :configure_nilesoft_shell
+
+echo.
+echo Option invalide. Veuillez réessayer
+pause
+goto :configure_programs
+
+:configure_nilesoft_shell
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration de Nilesoft Shell
+echo.
+
+if not exist "C:\Program Files\Nilesoft Shell\" (
+    echo x Nilesoft Shell n'est pas installé
+    echo Veuillez l'installer avant de le configurer
+    pause
+    goto :configure_programs
+)
+
+set "nilesoft_imports=C:\Program Files\Nilesoft Shell\imports"
+mkdir "%nilesoft_imports%" 2>nul
+
+powershell -Command "& { $files = @('develop.nss', 'file-manage.nss', 'goto.nss', 'modify.nss', 'taskbar.nss', 'terminal.nss', 'theme.nss'); foreach ($file in $files) { Invoke-WebRequest -Uri \"https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/Nilesoft%%20Shell/imports/$file\" -OutFile \"$env:nilesoft_imports\$file\" } }"
+
+if %errorlevel% equ 0 (
+    echo ► Nilesoft Shell configuré
+) else (
+    echo x Échec de la configuration de Nilesoft Shell
+)
+
+echo.
+pause
+REM A activer après l'ajout d'autres programmes
+REM goto :configure_programs
+goto :main_menu
 
 :end_of_script
 cls
