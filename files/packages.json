@@ -41,6 +41,11 @@
             "source": "winget"
         },
         {
+            "name": "Flow Launcher",
+            "id": "Flow-Launcher.Flow-Launcher",
+            "source": "winget"
+        },
+        {
             "name": "GeForce Now",
             "id": "Nvidia.GeForceNow",
             "source": "winget"
@@ -166,13 +171,28 @@
             "source": "winget"
         },
         {
-            "name": "VLC",
-            "id": "VideoLAN.VLC",
+            "name": "Python 3.13",
+            "id": "Python.Python.3.13",
+            "source": "winget"
+        },
+        {
+            "name": "Visual Studio BuildTools 2019",
+            "id": "Microsoft.VisualStudio.2019.BuildTools",
+            "source": "winget"
+        },
+        {
+            "name": "Visual Studio Community 2022",
+            "id": "Microsoft.VisualStudio.2022.Community",
             "source": "winget"
         },
         {
             "name": "Visual Studio Code",
             "id": "Microsoft.VisualStudioCode",
+            "source": "winget"
+        },
+        {
+            "name": "VLC",
+            "id": "VideoLAN.VLC",
             "source": "winget"
         },
         {
