@@ -54,5 +54,8 @@
   - Various modifications to the command line interface
 - 0.3.0 :
   - Add Chocolatery and custom install script
-  - Add configuration file hwith the list of programs
+  - Add package configuration file (list of programs sorted by name / id / provider)
+  - ...
+- 0.3.2 :
+  - Changed package configuration file format to JSON
   - ...
