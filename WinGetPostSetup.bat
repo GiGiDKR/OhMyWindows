@@ -467,15 +467,17 @@ echo.
 echo ■ Sélection des programmes à installer
 echo.
 
-if not exist "%ORIGINAL_PATH%packages.txt" (
-    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/packages.txt' -OutFile '%ORIGINAL_PATH%packages.txt'"
+if not exist "%ORIGINAL_PATH%packages.json" (
+    powershell -Command "Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/packages.json' -OutFile '%ORIGINAL_PATH%packages.json'"
 )
 
 set "counter=1"
-for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
-    set "program[!counter!]=%%a|%%b|%%c"
-    echo !counter! - %%a
-    set /a "counter+=1"
+for /f "tokens=* usebackq delims=" %%a in (`powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $counter = 1 } { $_.name + '|' + $_.id + '|' + $_.source + '|' + ($counter++) }"`) do (
+    for /f "tokens=1-4 delims=|" %%b in ("%%a") do (
+        set "program[!counter!]=%%b|%%c|%%d"
+        echo !counter! - %%b
+        set /a "counter+=1"
+    )
 )
 
 set /a "total_programs=counter-1"
@@ -485,7 +487,7 @@ echo A - Installer tous les programmes
 echo.
 echo %ligne1%
 echo.
-set /p choix=■ Saisir les numros (séparés par des espaces) : 
+set /p choix=■ Saisir les numéros (séparés par des espaces) : 
 
 if "%choix%"=="0" goto :main_menu
 if /i "%choix%"=="A" goto :install_all_programs
@@ -507,21 +509,23 @@ for %%i in (%choix%) do (
             winget install !id! --silent --accept-source-agreements --accept-package-agreements
         ) else if "!source!"=="choco" (
             choco install !id! -y -f
-        ) else if "!source!"=="custom" (
-            call :install_custom_program "!name!" "!id!"
+        ) else if "!source!"=="exe" (
+            call :install_custom_exe "!name!" "!id!"
+        ) else if "!source!"=="zip" (
+            call :install_custom_archive "!name!" "!id!"
         ) else (
             echo Source inconnue pour !name!
         )
         if !errorlevel! equ 0 (
             echo.
-            echo ► Installation de !name! rssie
+            echo ► Installation de !name! réussie
         ) else (
             echo.
             echo x Échec de l'installation de !name!
         )
     ) else (
         echo.
-        echo x Le programme numro %%i n'existe pas dans la liste.
+        echo x Le programme numéro %%i n'existe pas dans la liste.
     )
 )
 
@@ -536,26 +540,7 @@ echo %ligne2%
 echo %ligne3%
 echo.
 echo ■ Installation de tous les programmes
-for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
-    echo.
-    echo - Installation de %%a
-    if "%%c"=="winget" (
-        winget install %%b --silent --accept-source-agreements --accept-package-agreements
-    ) else if "%%c"=="choco" (
-        choco install %%b -y -f
-    ) else if "%%c"=="exe" (
-        call :install_custom_exe "%%a" "%%b"
-    ) else if "%%c"=="zip" (
-        call :install_custom_archive "%%a" "%%b"
-    ) else (
-        echo Source inconnue pour %%a
-    )
-    if !errorlevel! equ 0 (
-        echo ► Installation de %%a rssie
-    ) else (
-        echo x Échec de l'installation de %%a
-    )
-)
+powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { winget install $id --silent --accept-source-agreements --accept-package-agreements } elseif ($source -eq 'choco') { choco install $id -y -f } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name }; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } else { Write-Host 'x Échec de l''installation de ' $name } }"
 
 echo.
 pause
