@@ -506,22 +506,35 @@ for %%i in (%choix%) do (
         echo.
         echo - Installation de !name!
         if "!source!"=="winget" (
-            winget install !id! --silent --accept-source-agreements --accept-package-agreements
+            winget install !id! --silent --accept-source-agreements --accept-package-agreements >nul 2>&1
+            if !errorlevel! equ 0 (
+                echo.
+                echo ► Installation de !name! réussie
+            ) else if !errorlevel! equ -1978335189 (
+                echo.
+                echo ► La dernière version de !name! est déjà installée
+            ) else (
+                echo.
+                echo x Échec de l'installation de !name!
+            )
         ) else if "!source!"=="choco" (
-            choco install !id! -y -f
+            choco install !id! -y -f >nul 2>&1
+            if !errorlevel! equ 0 (
+                echo.
+                echo ► Installation de !name! réussie
+            ) else if !errorlevel! equ 3010 (
+                echo.
+                echo ► La dernière version de !name! est déjà installée
+            ) else (
+                echo.
+                echo x Échec de l'installation de !name!
+            )
         ) else if "!source!"=="exe" (
-            call :install_custom_exe "!name!" "!id!"
+            call :install_custom_exe "!name!" "!id!" >nul 2>&1
         ) else if "!source!"=="zip" (
-            call :install_custom_archive "!name!" "!id!"
+            call :install_custom_archive "!name!" "!id!" >nul 2>&1
         ) else (
             echo Source inconnue pour !name!
-        )
-        if !errorlevel! equ 0 (
-            echo.
-            echo ► Installation de !name! réussie
-        ) else (
-            echo.
-            echo x Échec de l'installation de !name!
         )
     ) else (
         echo.
@@ -540,7 +553,7 @@ echo %ligne2%
 echo %ligne3%
 echo.
 echo ■ Installation de tous les programmes
-powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { winget install $id --silent --accept-source-agreements --accept-package-agreements } elseif ($source -eq 'choco') { choco install $id -y -f } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name }; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } else { Write-Host 'x Échec de l''installation de ' $name } }"
+powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { $result = winget install $id --silent --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } elseif ($LASTEXITCODE -eq -1978335189) { Write-Host '► La dernière version de ' $name ' est déjà installée' } else { Write-Host 'x Échec de l''installation de ' $name } } elseif ($source -eq 'choco') { $result = choco install $id -y -f; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } elseif ($LASTEXITCODE -eq 3010) { Write-Host '► La dernière version de ' $name ' est déjà installée' } else { Write-Host 'x Échec de l''installation de ' $name } } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name } }"
 
 echo.
 pause
@@ -551,17 +564,13 @@ set "program_name=%~1"
 set "program_url=%~2"
 set "install_dir=C:\Program Files\%program_name%"
 
-echo - Installation de %program_name%
 mkdir "%install_dir%" 2>nul
 powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%install_dir%\%program_name%.exe' }"
 if %errorlevel% equ 0 (
     echo - Création du raccourci sur le bureau
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = '%install_dir%\%program_name%.exe'; $Shortcut.Save() }"
-    echo ► Installation de %program_name% réussie
-) else (
-    echo x Échec de l'installation de %program_name%
-)
 goto :eof
+)
 
 :install_custom_archive
 set "program_name=%~1"
@@ -569,16 +578,13 @@ set "program_url=%~2"
 set "temp_dir=%TEMP%\%program_name%_install"
 set "install_dir=C:\Program Files\%program_name%"
 
-echo - Installation de %program_name%
 mkdir "%temp_dir%" 2>nul
 powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%temp_dir%\archive.zip'; Expand-Archive -Path '%temp_dir%\archive.zip' -DestinationPath '%temp_dir%' -Force; $extractedFolder = Get-ChildItem -Path '%temp_dir%' -Directory | Select-Object -First 1; Move-Item -Path $extractedFolder.FullName -Destination '%install_dir%' -Force }"
 if %errorlevel% equ 0 (
     echo - Création du raccourci sur le bureau
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $exeFile = Get-ChildItem -Path '%install_dir%' -Recurse -Filter '*.exe' | Where-Object { $_.Name -like '*%program_name%*' } | Select-Object -First 1; if ($exeFile) { $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = $exeFile.FullName; $Shortcut.WorkingDirectory = $exeFile.DirectoryName; $Shortcut.Save(); echo '► Raccourci créé pour ' + $exeFile.Name } else { echo 'x Aucun exécutable correspondant trouvé pour %program_name%' } }"
-    echo ► Installation de %program_name% réussie
-) else (
-    echo x Échec de l'installation de %program_name%
 )
+
 rmdir /s /q "%temp_dir%" 2>nul
 goto :eof
 

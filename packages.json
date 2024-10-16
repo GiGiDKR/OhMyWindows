@@ -1,0 +1,224 @@
+{
+    "packages": [
+        {
+            "name": "7zip",
+            "id": "7zip.7zip",
+            "source": "winget"
+        },
+        {
+            "name": "Captvty",
+            "id": "https://releases.captvty.fr/d2f1321136a0a9a207b164a99471723abf6db8cb/captvty-2.10.8.1.zip",
+            "source": "zip"
+        },
+        {
+            "name": "Cleanmgr+",
+            "id": "cleanmgr-plus",
+            "source": "choco"
+        },
+        {
+            "name": "Clink",
+            "id": "chrisant996.Clink",
+            "source": "winget"
+        },
+        {
+            "name": "Cursor.ai",
+            "id": "Anysphere.Cursor",
+            "source": "winget"
+        },
+        {
+            "name": "Docker Desktop",
+            "id": "Docker.DockerDesktop",
+            "source": "winget"
+        },
+        {
+            "name": "Everything",
+            "id": "voidtools.Everything",
+            "source": "winget"
+        },
+        {
+            "name": "ExplorerPatcher",
+            "id": "valinet.ExplorerPatcher.Prerelease",
+            "source": "winget"
+        },
+        {
+            "name": "GeForce Now",
+            "id": "Nvidia.GeForceNow",
+            "source": "winget"
+        },
+        {
+            "name": "Git",
+            "id": "Git.Git",
+            "source": "winget"
+        },
+        {
+            "name": "GitHub CLI",
+            "id": "GitHub.cli",
+            "source": "winget"
+        },
+        {
+            "name": "GitHub Desktop",
+            "id": "GitHub.GitHubDesktop",
+            "source": "winget"
+        },
+        {
+            "name": "Glary Utilities",
+            "id": "Glarysoft.GlaryUtilities",
+            "source": "winget"
+        },
+        {
+            "name": "Google Chrome",
+            "id": "Google.Chrome",
+            "source": "winget"
+        },
+        {
+            "name": "Google Drive",
+            "id": "Google.GoogleDrive",
+            "source": "winget"
+        },
+        {
+            "name": "Mica For Everyone",
+            "id": "MicaForEveryone.MicaForEveryone",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft .NET 3.1",
+            "id": "Microsoft.DotNet.DesktopRuntime.3_1",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft .NET 5",
+            "id": "Microsoft.DotNet.DesktopRuntime.5",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft .NET 6",
+            "id": "Microsoft.DotNet.Runtime.6",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft .NET 7",
+            "id": "Microsoft.DotNet.DesktopRuntime.7",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft .NET 8",
+            "id": "Microsoft.DotNet.DesktopRuntime.8",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft Paint",
+            "id": "9PCFS5B6T72H",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft PC Manager",
+            "id": "Microsoft.PCManager",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft Photos",
+            "id": "9WZDNCRFJBH4",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft Capture",
+            "id": "9MZ95KL8MR0L",
+            "source": "winget"
+        },
+        {
+            "name": "Microsoft Visual C++ 2015-2022",
+            "id": "Microsoft.VCRedist.2015+.x64",
+            "source": "winget"
+        },
+        {
+            "name": "Nilesoft Shell",
+            "id": "Nilesoft.Shell",
+            "source": "winget"
+        },
+        {
+            "name": "Obsidian",
+            "id": "Obsidian.Obsidian",
+            "source": "winget"
+        },
+        {
+            "name": "OhMyPosh",
+            "id": "JanDeDobbeleer.OhMyPosh",
+            "source": "winget"
+        },
+        {
+            "name": "Optimizer",
+            "id": "https://github.com/hellzerg/optimizer/releases/download/15.9/Optimizer-15.9.exe",
+            "source": "exe"
+        },
+        {
+            "name": "Password Manager SafeInCloud",
+            "id": "9NLXL1B6J7LW",
+            "source": "winget"
+        },
+        {
+            "name": "PowerShell",
+            "id": "Microsoft.PowerShell",
+            "source": "winget"
+        },
+        {
+            "name": "PowerToys",
+            "id": "Microsoft.PowerToys",
+            "source": "winget"
+        },
+        {
+            "name": "VLC",
+            "id": "VideoLAN.VLC",
+            "source": "winget"
+        },
+        {
+            "name": "Visual Studio Code",
+            "id": "Microsoft.VisualStudioCode",
+            "source": "winget"
+        },
+        {
+            "name": "Windows Calculator",
+            "id": "9WZDNCRFHVN5",
+            "source": "winget"
+        },
+        {
+            "name": "Windows Media Player",
+            "id": "9WZDNCRFJ3PT",
+            "source": "winget"
+        },
+        {
+            "name": "Windows Notepad",
+            "id": "9MSMLRH6LZF3",
+            "source": "winget"
+        },
+        {
+            "name": "Windows Terminal",
+            "id": "Microsoft.WindowsTerminal",
+            "source": "winget"
+        },
+        {
+            "name": "WindowGrid",
+            "id": "windowgrid",
+            "source": "choco"
+        },
+        {
+            "name": "Windhawk",
+            "id": "RamenSoftware.Windhawk",
+            "source": "winget"
+        },
+        {
+            "name": "WizTree",
+            "id": "AntibodySoftware.WizTree",
+            "source": "winget"
+        },
+        {
+            "name": "WSL2 Distro Manager",
+            "id": "wsl2-distro-manager",
+            "source": "choco"
+        },
+        {
+            "name": "WSL Studio",
+            "id": "9PLSJR4TG2GQ",
+            "source": "winget"
+        }
+    ]
+}
