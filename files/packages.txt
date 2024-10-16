@@ -1,4 +1,5 @@
 7zip|7zip.7zip|winget
+Captvty|https://releases.captvty.fr/d2f1321136a0a9a207b164a99471723abf6db8cb/captvty-2.10.8.1.zip|zip
 Cleanmgr+|cleanmgr-plus|choco
 Clink|chrisant996.Clink|winget
 Cursor.ai|Anysphere.Cursor|winget
@@ -26,7 +27,7 @@ Microsoft Visual C++ 2015-2022|Microsoft.VCRedist.2015+.x64|winget
 Nilesoft Shell|Nilesoft.Shell|winget
 Obsidian|Obsidian.Obsidian|winget
 OhMyPosh|JanDeDobbeleer.OhMyPosh|winget
-Optimizer|https://github.com/hellzerg/optimizer/releases/download/15.9/Optimizer-15.9.exe|custom
+Optimizer|https://github.com/hellzerg/optimizer/releases/download/15.9/Optimizer-15.9.exe|exe
 Password Manager SafeInCloud|9NLXL1B6J7LW|winget
 PowerShell|Microsoft.PowerShell|winget
 PowerToys|Microsoft.PowerToys|winget

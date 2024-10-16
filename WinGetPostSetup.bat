@@ -543,8 +543,10 @@ for /f "tokens=1,2,3 delims=|" %%a in (%ORIGINAL_PATH%packages.txt) do (
         winget install %%b --silent --accept-source-agreements --accept-package-agreements
     ) else if "%%c"=="choco" (
         choco install %%b -y -f
-    ) else if "%%c"=="custom" (
-        call :install_custom_program "%%a" "%%b"
+    ) else if "%%c"=="exe" (
+        call :install_custom_exe "%%a" "%%b"
+    ) else if "%%c"=="zip" (
+        call :install_custom_archive "%%a" "%%b"
     ) else (
         echo Source inconnue pour %%a
     )
@@ -559,7 +561,7 @@ echo.
 pause
 goto :main_menu
 
-:install_custom_program
+:install_custom_exe
 set "program_name=%~1"
 set "program_url=%~2"
 set "install_dir=C:\Program Files\%program_name%"
@@ -568,12 +570,31 @@ echo - Installation de %program_name%
 mkdir "%install_dir%" 2>nul
 powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%install_dir%\%program_name%.exe' }"
 if %errorlevel% equ 0 (
-    echo - Cration du raccourci sur le bureau
+    echo - Création du raccourci sur le bureau
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = '%install_dir%\%program_name%.exe'; $Shortcut.Save() }"
-    echo ► Installation de %program_name% rssie
+    echo ► Installation de %program_name% réussie
 ) else (
     echo x Échec de l'installation de %program_name%
 )
+goto :eof
+
+:install_custom_archive
+set "program_name=%~1"
+set "program_url=%~2"
+set "temp_dir=%TEMP%\%program_name%_install"
+set "install_dir=C:\Program Files\%program_name%"
+
+echo - Installation de %program_name%
+mkdir "%temp_dir%" 2>nul
+powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%temp_dir%\archive.zip'; Expand-Archive -Path '%temp_dir%\archive.zip' -DestinationPath '%temp_dir%' -Force; $extractedFolder = Get-ChildItem -Path '%temp_dir%' -Directory | Select-Object -First 1; Move-Item -Path $extractedFolder.FullName -Destination '%install_dir%' -Force }"
+if %errorlevel% equ 0 (
+    echo - Création du raccourci sur le bureau
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $exeFile = Get-ChildItem -Path '%install_dir%' -Recurse -Filter '*.exe' | Where-Object { $_.Name -like '*%program_name%*' } | Select-Object -First 1; if ($exeFile) { $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = $exeFile.FullName; $Shortcut.WorkingDirectory = $exeFile.DirectoryName; $Shortcut.Save(); echo '► Raccourci créé pour ' + $exeFile.Name } else { echo 'x Aucun exécutable correspondant trouvé pour %program_name%' } }"
+    echo ► Installation de %program_name% réussie
+) else (
+    echo x Échec de l'installation de %program_name%
+)
+rmdir /s /q "%temp_dir%" 2>nul
 goto :eof
 
 :apply_windows_settings
@@ -652,35 +673,43 @@ echo ;Shell Icon
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons]
 echo "29"="!shellIconValue!"
 echo.
+
 echo ;Show Copy More Details
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager]
 echo "EnthusiastMode"=dword:00000001
 echo.
+
 echo ;Start
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
 echo "HideRecentlyAddedApps"=dword:00000001
 echo "ShowOrHideMostUsedApps"=dword:00000002
 echo.
+
 echo ;No Recent Docs History
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
 echo "NoRecentDocsHistory"=dword:00000001
 echo.
+
 echo ;Start_TrackDocs
 echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 echo "Start_TrackDocs"=dword:00000000
 echo.
+
 echo ;Disable Subscribed Content
 echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
 echo "SubscribedContent-338388Enabled"=dword:00000000
 echo.
+
 echo ;Offline Maps
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Maps]
 echo "AutoDownloadAndUpdateMapData"=dword:00000000
 echo.
+
 echo ;Disable Edge Desktop Icon
 echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
 echo "DisableEdgeDesktopShortcutCreation"=dword:00000001
 echo.
+
 echo ;Mouse acceleration
 echo [HKEY_CURRENT_USER\Control Panel\Mouse]
 echo "MouseSpeed"="1"
