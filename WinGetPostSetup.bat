@@ -245,6 +245,28 @@ powershell -Command "& { $latestRelease = (Invoke-WebRequest -Uri 'https://api.g
 if %errorlevel% equ 0 (
     echo.
     echo ► Optimizer téléchargé avec succès
+
+    :: Création du raccourci sur le bureau
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Optimizer.lnk'); $Shortcut.TargetPath = '%install_dir%\Optimizer.exe'; $Shortcut.WorkingDirectory = '%install_dir%'; $Shortcut.Save() }"
+
+    echo ► Création d'un raccourci
+
+    :: Création du désinstallateur
+    echo @echo off > "%install_dir%\uninstall.bat"
+    echo taskkill /F /IM Optimizer.exe 2^>nul >> "%install_dir%\uninstall.bat"
+    echo rmdir /s /q "%install_dir%" >> "%install_dir%\uninstall.bat"
+    echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /f >> "%install_dir%\uninstall.bat"
+    echo del "%USERPROFILE%\Desktop\Optimizer.lnk" >> "%install_dir%\uninstall.bat"
+    echo exit >> "%install_dir%\uninstall.bat"
+
+    :: Ajout des informations de désinstallation dans le registre
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "DisplayName" /t REG_SZ /d "Optimizer" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "UninstallString" /t REG_SZ /d "\"%install_dir%\uninstall.bat\"" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "DisplayIcon" /t REG_SZ /d "%install_dir%\Optimizer.exe" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "Publisher" /t REG_SZ /d "Hellzerg" /f
+
+    echo ► Création d'un désinstallateur
+    
     start "" "%install_dir%\Optimizer.exe"
 ) else (
     echo x Échec du téléchargement d'Optimizer
@@ -1017,7 +1039,22 @@ move "%tempFolder%\platform-tools" "%adbDestination%" >nul 2>&1
 setx PATH "%PATH%;%adbDestination%" /M >nul 2>&1
 
 if %errorlevel% equ 0 (
-    echo ► ADB install avec succès
+    echo ► ADB installé avec succès
+    
+    :: Création du désinstallateur
+    echo @echo off > "%adbDestination%\uninstall.bat"
+    echo setx PATH "%%PATH:%adbDestination%;=%%" /M >> "%adbDestination%\uninstall.bat"
+    echo rmdir /s /q "%adbDestination%" >> "%adbDestination%\uninstall.bat"
+    echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /f >> "%adbDestination%\uninstall.bat"
+    echo exit >> "%adbDestination%\uninstall.bat"
+
+    :: Ajout des informations de désinstallation dans le registre
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "DisplayName" /t REG_SZ /d "Android Debug Bridge (ADB)" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "UninstallString" /t REG_SZ /d "\"%adbDestination%\uninstall.bat\"" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "DisplayIcon" /t REG_SZ /d "%adbDestination%\adb.exe" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "Publisher" /t REG_SZ /d "Google LLC" /f
+
+    echo ► Création d'un désinstallateur
 ) else (
     echo x Échec de l'installation de ADB
 )
@@ -1047,6 +1084,21 @@ powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%
 
 if exist "%scrcpyDestination%" (
     setx PATH "%PATH%;%scrcpyDestination%" /M >nul 2>&1
+
+    :: Création du désinstallateur
+    echo @echo off > "%scrcpyDestination%\uninstall.bat"
+    echo setx PATH "%%PATH:%scrcpyDestination%;=%%" /M >> "%scrcpyDestination%\uninstall.bat"
+    echo rmdir /s /q "%scrcpyDestination%" >> "%scrcpyDestination%\uninstall.bat"
+    echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Scrcpy" /f >> "%scrcpyDestination%\uninstall.bat"
+    echo exit >> "%scrcpyDestination%\uninstall.bat"
+
+    :: Ajout des informations de désinstallation dans le registre
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Scrcpy" /v "DisplayName" /t REG_SZ /d "Scrcpy" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Scrcpy" /v "UninstallString" /t REG_SZ /d "\"%scrcpyDestination%\uninstall.bat\"" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Scrcpy" /v "DisplayIcon" /t REG_SZ /d "%scrcpyDestination%\scrcpy.exe" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Scrcpy" /v "Publisher" /t REG_SZ /d "Genymobile" /f
+
+    echo ► Création d'un désinstallateur
 )
 
 rmdir /s /q "%tempFolder%" 2>nul
@@ -1083,10 +1135,23 @@ if %errorlevel% equ 0 (
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Odin 3.lnk'); $Shortcut.TargetPath = '%odin3Destination%\Odin3_v3.14.4_Samfw.com.exe'; $Shortcut.WorkingDirectory = '%odin3Destination%'; $Shortcut.Save() }"
     
     if %errorlevel% equ 0 (
-        echo ► Raccourci créé sur le bureau
+        echo ► Création d'un raccourci
     ) else (
         echo x Échec de la création du raccourci
     )
+
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Odin3" /v "DisplayName" /t REG_SZ /d "Odin 3" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Odin3" /v "DisplayVersion" /t REG_SZ /d "3.14.4" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Odin3" /v "Publisher" /t REG_SZ /d "SamFW" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Odin3" /v "UninstallString" /t REG_SZ /d "\"C:\Android\Odin 3\uninstall.bat\"" /f
+
+    echo @echo off > "%odin3Destination%\uninstall.bat"
+    echo rmdir /s /q "%odin3Destination%" >> "%odin3Destination%\uninstall.bat"
+    echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Odin3" /f >> "%odin3Destination%\uninstall.bat"
+    echo del "%USERPROFILE%\Desktop\Odin 3.lnk" >> "%odin3Destination%\uninstall.bat"
+    echo exit >> "%odin3Destination%\uninstall.bat"
+
+    echo ► Création d'un désinstallateur
 ) else (
     echo x Échec de l'installation de Odin 3
 )
@@ -1145,10 +1210,23 @@ if %errorlevel% equ 0 (
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Pixel Flasher.lnk'); $Shortcut.TargetPath = '%pixelFlasherDestination%\PixelFlasher.exe'; $Shortcut.Save() }"
 
     if %errorlevel% equ 0 (
-        echo ► Raccourci créé sur le bureau
+        echo ► Création d'un raccourci
     ) else (
         echo x Échec de la création du raccourci
     )
+
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PixelFlasher" /v "DisplayName" /t REG_SZ /d "Pixel Flasher" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PixelFlasher" /v "DisplayVersion" /t REG_SZ /d "7.5.0.0" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PixelFlasher" /v "Publisher" /t REG_SZ /d "Badabing" /f
+    reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PixelFlasher" /v "UninstallString" /t REG_SZ /d "\"C:\Android\Pixel Flasher\uninstall.bat\"" /f
+
+    echo @echo off > "%pixelFlasherDestination%\uninstall.bat"
+    echo rmdir /s /q "%pixelFlasherDestination%" >> "%pixelFlasherDestination%\uninstall.bat"
+    echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\PixelFlasher" /f >> "%pixelFlasherDestination%\uninstall.bat"
+    echo del "%USERPROFILE%\Desktop\Pixel Flasher.lnk" >> "%pixelFlasherDestination%\uninstall.bat"
+    echo exit >> "%pixelFlasherDestination%\uninstall.bat"
+
+    echo ► Création d'un désinstallateur
 ) else (
     echo x Échec de l'installation de Pixel Flasher
 )
@@ -1296,6 +1374,12 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
+echo ► Script terminé !
+echo.
+pause
+
+endlocal
+
 echo ► Script terminé !
 echo.
 pause

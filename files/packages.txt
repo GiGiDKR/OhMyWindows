@@ -33,7 +33,10 @@ Password Manager SafeInCloud|9NLXL1B6J7LW|winget
 Python 3.13|Python.Python.3.13|winget
 PowerShell|Microsoft.PowerShell|winget
 PowerToys|Microsoft.PowerToys|winget
-Python 3.13                          Python.Python.3.13 
+Python 3.13|Python.Python.3.13|winget
+RealVNC Server|RealVNC.VNCServer|winget
+RealVNC Viewer|RealVNC.VNCViewer|winget
+Rufus|Rufus.Rufus|winget
 Visual Studio BuildTools 2019|Microsoft.VisualStudio.2019.BuildTools|winget
 Visual Studio Code|Microsoft.VisualStudioCode|winget
 Visual Studio Community 2022|Microsoft.VisualStudio.2022.Community|winget

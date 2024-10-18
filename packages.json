@@ -176,21 +176,6 @@
             "source": "winget"
         },
         {
-            "name": "Rufus",
-            "id": "Rufus.Rufus",
-            "source": "winget"
-        },
-        {
-            "name": "RealVNC Server",
-            "id": "RealVNC.VNCServer",
-            "source": "winget"
-        },
-        {
-            "name": "RealVNC Viewer",
-            "id": "RealVNC.VNCViewer",
-            "source": "winget"
-        },
-        {
             "name": "Visual Studio BuildTools 2019",
             "id": "Microsoft.VisualStudio.2019.BuildTools",
             "source": "winget"
