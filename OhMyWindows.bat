@@ -52,7 +52,7 @@ echo.
 where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
-    echo ► Version de Winget : %winget_version%
+    echo â–º Version de Winget : %winget_version%
     goto :check_windows_terminal
 ) else (
     echo x Winget n'est pas installé sur votre système
@@ -79,7 +79,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo ■ Installation des gestionnaires de paquets
+echo Installation des gestionnaires de paquets
 echo.
 
 echo - Installation de Winget
@@ -110,7 +110,7 @@ echo - Nettoyage des fichiers temporaires
 rmdir /s /q "%tempFolder%" >nul 2>&1
 
 echo.
-echo ► Winget a été installé avec succès !
+echo ► Installation de Winget terminée !
 call :version_winget
 
 echo.
@@ -119,12 +119,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "Set-ExecutionPolicy Bypa
 
 if %errorlevel% equ 0 (
     echo.
-    echo ► Chocolatey a été installé avec succès !
+    echo ► Installation de Chocolatey terminée !
     echo.
     choco --version
 ) else (
     echo.
-    echo x Échec de l'installation de Chocolatey
+    echo x Ã‰chec de l'installation de Chocolatey
 )
 
 echo.
@@ -259,14 +259,14 @@ if %errorlevel% equ 0 (
     echo del "%USERPROFILE%\Desktop\Optimizer.lnk" >> "%install_dir%\uninstall.bat"
     echo exit >> "%install_dir%\uninstall.bat"
 
-    :: Ajout des informations de désinstallation dans le registre
+    :: Ajout des informations de dÃ©sinstallation dans le registre
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "DisplayName" /t REG_SZ /d "Optimizer" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "UninstallString" /t REG_SZ /d "\"%install_dir%\uninstall.bat\"" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "DisplayIcon" /t REG_SZ /d "%install_dir%\Optimizer.exe" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Optimizer" /v "Publisher" /t REG_SZ /d "Hellzerg" /f
 
     echo ► Création d'un désinstallateur
-    
+
     start "" "%install_dir%\Optimizer.exe"
 ) else (
     echo x Échec du téléchargement d'Optimizer
@@ -413,13 +413,13 @@ echo.
 echo ■ Installation de Windows Sandbox
 DISM /Online /Enable-Feature /FeatureName:"Containers-DisposableClientVM" /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► Windows Sandbox a t install avec succs
+    echo ► Windows Sandbox a été installé avec succès
     echo.
     echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) elseif %errorlevel% equ 3010 (
     echo ► Windows Sandbox a été installé avec succès
     echo.
-    echo Un redmarrage sera ncessaire pour finaliser l'installation
+    echo Un redémarrage sera nécessaire pour finaliser l'installation
 ) else (
     echo x Échec de l'installation de Windows Sandbox
 )
@@ -436,7 +436,7 @@ echo.
 echo ■ Installation de .NET Framework 3.5
 DISM /Online /Enable-Feature /FeatureName:NetFx3 /All /NoRestart
 if %errorlevel% equ 0 (
-    echo ► .NET Framework 3.5 a t install avec succs
+    echo ► .NET Framework 3.5 a été installé avec succès
     echo.
     echo Un redémarrage peut être nécessaire pour finaliser l'installation
 ) else if %errorlevel% equ 3010 (
@@ -560,7 +560,7 @@ for %%i in (%choix%) do (
         )
     ) else (
         echo.
-        echo x Le programme numéro %%i n'existe pas dans la liste.
+        echo x Le programme numÃ©ro %%i n'existe pas dans la liste.
     )
 )
 
@@ -575,7 +575,7 @@ echo %ligne2%
 echo %ligne3%
 echo.
 echo ■ Installation de tous les programmes
-powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { $result = winget install $id --silent --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } elseif ($LASTEXITCODE -eq -1978335189) { Write-Host '► La dernière version de ' $name ' est déjà installée' } else { Write-Host 'x Échec de l''installation de ' $name } } elseif ($source -eq 'choco') { $result = choco install $id -y -f; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de ' $name ' réussie' } elseif ($LASTEXITCODE -eq 3010) { Write-Host '► La dernière version de ' $name ' est déjà installée' } else { Write-Host 'x Échec de l''installation de ' $name } } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name } }"
+powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { $result = winget install $id --silent --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -eq 0) { Write-Host 'â–º Installation de ' $name ' rÃ©ussie' } elseif ($LASTEXITCODE -eq -1978335189) { Write-Host 'â–º La derniÃ¨re version de ' $name ' est dÃ©jÃ  installÃ©e' } else { Write-Host 'x Ã‰chec de l''installation de ' $name } } elseif ($source -eq 'choco') { $result = choco install $id -y -f; if ($LASTEXITCODE -eq 0) { Write-Host 'â–º Installation de ' $name ' rÃ©ussie' } elseif ($LASTEXITCODE -eq 3010) { Write-Host 'â–º La derniÃ¨re version de ' $name ' est dÃ©jÃ  installÃ©e' } else { Write-Host 'x Ã‰chec de l''installation de ' $name } } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name } }"
 
 echo.
 pause
@@ -604,7 +604,7 @@ mkdir "%temp_dir%" 2>nul
 powershell -Command "& { Invoke-WebRequest -Uri '%program_url%' -OutFile '%temp_dir%\archive.zip'; Expand-Archive -Path '%temp_dir%\archive.zip' -DestinationPath '%temp_dir%' -Force; $extractedFolder = Get-ChildItem -Path '%temp_dir%' -Directory | Select-Object -First 1; Move-Item -Path $extractedFolder.FullName -Destination '%install_dir%' -Force }"
 if %errorlevel% equ 0 (
     echo - Création du raccourci sur le bureau
-    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $exeFile = Get-ChildItem -Path '%install_dir%' -Recurse -Filter '*.exe' | Where-Object { $_.Name -like '*%program_name%*' } | Select-Object -First 1; if ($exeFile) { $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = $exeFile.FullName; $Shortcut.WorkingDirectory = $exeFile.DirectoryName; $Shortcut.Save(); echo '► Raccourci créé pour ' + $exeFile.Name } else { echo 'x Aucun exécutable correspondant trouvé pour %program_name%' } }"
+    powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $exeFile = Get-ChildItem -Path '%install_dir%' -Recurse -Filter '*.exe' | Where-Object { $_.Name -like '*%program_name%*' } | Select-Object -First 1; if ($exeFile) { $Shortcut = $WshShell.CreateShortcut([System.IO.Path]::Combine($env:USERPROFILE, 'Desktop', '%program_name%.lnk')); $Shortcut.TargetPath = $exeFile.FullName; $Shortcut.WorkingDirectory = $exeFile.DirectoryName; $Shortcut.Save(); echo 'â–º Raccourci crÃ©Ã© pour ' + $exeFile.Name } else { echo 'x Aucun exÃ©cutable correspondant trouvÃ© pour %program_name%' } }"
 )
 
 rmdir /s /q "%temp_dir%" 2>nul
@@ -756,7 +756,7 @@ if %errorlevel% equ 0 (
     set "tempFolder=%TEMP%\MicrosoftStoreInstall"
     mkdir "%tempFolder%" 2>nul
 
-    echo - Tlchargement des fichiers ncessaires
+    echo - Téléchargement des fichiers nécessaires
     start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
         https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
@@ -898,7 +898,7 @@ pause
 goto :main_menu
 
 :install_fonts
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$fontPath = '%userprofile%\AppData\Local\Microsoft\Windows\Fonts\MesloLGLNerdFont-Regular.ttf'; if (-not (Test-Path $fontPath)) { $tempFolder = Join-Path $env:TEMP 'Font'; $fontUrl = 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip'; $fontZip = Join-Path $tempFolder 'MesloLGLNerdFont.zip'; $extractFolder = Join-Path $tempFolder 'MesloLGLNerdFont'; New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null; New-Item -ItemType Directory -Force -Path $extractFolder | Out-Null; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip; if (Test-Path $fontZip) { Expand-Archive -Path $fontZip -DestinationPath $extractFolder -Force; Get-ChildItem -Path $extractFolder -Filter '*.ttf' | ForEach-Object { $fontName = $_.Name; $fontPath = $_.FullName; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere($fontPath, 0x10) }; Remove-Item -Path $extractFolder -Recurse -Force; Write-Host '► Police Meslo LGL Nerd installée avec succès' } else { Write-Host 'x Échec du téléchargement des polices' } } else { Write-Host '► La police Meslo LGL Nerd est déjà installée' }"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$fontPath = '%userprofile%\AppData\Local\Microsoft\Windows\Fonts\MesloLGLNerdFont-Regular.ttf'; if (-not (Test-Path $fontPath)) { $tempFolder = Join-Path $env:TEMP 'Font'; $fontUrl = 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip'; $fontZip = Join-Path $tempFolder 'MesloLGLNerdFont.zip'; $extractFolder = Join-Path $tempFolder 'MesloLGLNerdFont'; New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null; New-Item -ItemType Directory -Force -Path $extractFolder | Out-Null; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip; if (Test-Path $fontZip) { Expand-Archive -Path $fontZip -DestinationPath $extractFolder -Force; Get-ChildItem -Path $extractFolder -Filter '*.ttf' | ForEach-Object { $fontName = $_.Name; $fontPath = $_.FullName; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere($fontPath, 0x10) }; Remove-Item -Path $extractFolder -Recurse -Force; Write-Host 'â–º Police Meslo LGL Nerd installÃ©e avec succÃ¨s' } else { Write-Host 'x Ã‰chec du tÃ©lÃ©chargement des polices' } } else { Write-Host 'â–º La police Meslo LGL Nerd est dÃ©jÃ  installÃ©e' }"
 goto :eof
 
 :configure_powershell_profile
@@ -907,7 +907,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointMan
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$profileFile = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'; $profilePath = Split-Path $profileFile; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile"
 
 if %errorlevel% equ 0 (
-    echo - Profil PowerShell configuré
+    echo - Profil PowerShell configurÃ©
 ) else (
     echo x Échec de la configuration du profil PowerShell
 )
@@ -924,7 +924,7 @@ powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.c
 if %errorlevel% equ 0 (
     reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f >nul 2>&1
     if %errorlevel% equ 0 (
-        echo - Aias Doskey configurés
+        echo - Alias Doskey configurés
     ) else (
         echo x Échec de la configuration des alias Doskey
     )
@@ -1000,7 +1000,7 @@ echo 5 - Pixel Flasher
 echo.
 echo 0 - Retour au menu principal
 echo.
-set /p android_choice=■ Sélectionner une option : 
+set /p android_choice=Sélectionner une option : 
 
 if "%android_choice%"=="0" goto :main_menu
 if "%android_choice%"=="1" goto :install_adb
@@ -1048,7 +1048,7 @@ if %errorlevel% equ 0 (
     echo reg delete "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /f >> "%adbDestination%\uninstall.bat"
     echo exit >> "%adbDestination%\uninstall.bat"
 
-    :: Ajout des informations de désinstallation dans le registre
+    :: Ajout des informations de dÃ©sinstallation dans le registre
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "DisplayName" /t REG_SZ /d "Android Debug Bridge (ADB)" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "UninstallString" /t REG_SZ /d "\"%adbDestination%\uninstall.bat\"" /f
     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\ADB" /v "DisplayIcon" /t REG_SZ /d "%adbDestination%\adb.exe" /f
@@ -1080,7 +1080,7 @@ set "scrcpyDestination=C:\Android\scrcpy"
 mkdir "%tempFolder%" 2>nul
 mkdir "C:\Android" 2>nul
 
-powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%'; $asset = $latestRelease.assets | Where-Object { $_.name -like 'scrcpy-win64-v*.zip' } | Select-Object -First 1; if ($asset) { if (Test-Path '%scrcpyDestination%') { Write-Host '► Scrcpy est déjà installé' } else { Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%scrcpyZip%'; if (Test-Path '%scrcpyZip%') { Expand-Archive -Path '%scrcpyZip%' -DestinationPath '%tempFolder%' -Force; $extractedFolder = Get-ChildItem -Path '%tempFolder%' -Directory | Select-Object -First 1; if ($extractedFolder) { Move-Item -Path $extractedFolder.FullName -Destination '%scrcpyDestination%' -Force; Write-Host '► Scrcpy installé avec succès' } else { Write-Host 'x Dossier extrait non trouvé' } } else { Write-Host 'x Échec du téléchargement' } } } else { Write-Host 'x Asset non trouvé' } }"
+powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%'; $asset = $latestRelease.assets | Where-Object { $_.name -like 'scrcpy-win64-v*.zip' } | Select-Object -First 1; if ($asset) { if (Test-Path '%scrcpyDestination%') { Write-Host 'â–º Scrcpy est dÃ©jÃ  installÃ©' } else { Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%scrcpyZip%'; if (Test-Path '%scrcpyZip%') { Expand-Archive -Path '%scrcpyZip%' -DestinationPath '%tempFolder%' -Force; $extractedFolder = Get-ChildItem -Path '%tempFolder%' -Directory | Select-Object -First 1; if ($extractedFolder) { Move-Item -Path $extractedFolder.FullName -Destination '%scrcpyDestination%' -Force; Write-Host 'â–º Scrcpy installÃ© avec succÃ¨s' } else { Write-Host 'x Dossier extrait non trouvÃ©' } } else { Write-Host 'x Ã‰chec du tÃ©lÃ©chargement' } } } else { Write-Host 'x Asset non trouvÃ©' } }"
 
 if exist "%scrcpyDestination%" (
     setx PATH "%PATH%;%scrcpyDestination%" /M >nul 2>&1
