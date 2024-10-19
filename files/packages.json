@@ -81,6 +81,11 @@
             "source": "winget"
         },
         {
+            "name": "Logitech Options+",
+            "id": "Logitech.OptionsPlus",
+            "source": "winget"
+        },
+        {
             "name": "Mica For Everyone",
             "id": "MicaForEveryone.MicaForEveryone",
             "source": "winget"

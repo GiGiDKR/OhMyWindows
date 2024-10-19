@@ -249,7 +249,7 @@ if %errorlevel% equ 0 (
     :: Création du raccourci sur le bureau
     powershell -Command "& { $WshShell = New-Object -ComObject WScript.Shell; $Shortcut = $WshShell.CreateShortcut($env:USERPROFILE + '\Desktop\Optimizer.lnk'); $Shortcut.TargetPath = '%install_dir%\Optimizer.exe'; $Shortcut.WorkingDirectory = '%install_dir%'; $Shortcut.Save() }"
 
-    echo ► Création d'un raccourci
+    echo  Création d'un raccourci
 
     :: Création du désinstallateur
     echo @echo off > "%install_dir%\uninstall.bat"
@@ -521,43 +521,7 @@ for %%i in (%choix%) do (
             set "id=%%b"
             set "source=%%c"
         )
-        cls
-        echo %ligne1%
-        echo %ligne2%
-        echo %ligne3%
-        echo.
-        echo - Installation de !name!
-        if "!source!"=="winget" (
-            winget install !id! --silent --accept-source-agreements --accept-package-agreements >nul 2>&1
-            if !errorlevel! equ 0 (
-                echo.
-                echo ► Installation de !name! réussie
-            ) else if !errorlevel! equ -1978335189 (
-                echo.
-                echo ► La dernière version de !name! est déjà installée
-            ) else (
-                echo.
-                echo x Échec de l'installation de !name!
-            )
-        ) else if "!source!"=="choco" (
-            choco install !id! -y -f >nul 2>&1
-            if !errorlevel! equ 0 (
-                echo.
-                echo ► Installation de !name! réussie
-            ) else if !errorlevel! equ 3010 (
-                echo.
-                echo ► La dernière version de !name! est déjà installée
-            ) else (
-                echo.
-                echo x Échec de l'installation de !name!
-            )
-        ) else if "!source!"=="exe" (
-            call :install_custom_exe "!name!" "!id!" >nul 2>&1
-        ) else if "!source!"=="zip" (
-            call :install_custom_archive "!name!" "!id!" >nul 2>&1
-        ) else (
-            echo Source inconnue pour !name!
-        )
+        call :install_programme "!name!" "!id!" "!source!"
     ) else (
         echo.
         echo x Le programme numéro %%i n'existe pas dans la liste.
@@ -567,6 +531,95 @@ for %%i in (%choix%) do (
 echo.
 pause
 goto :install_programmes
+
+:install_programme
+set "programme_name=%~1"
+set "programme_id=%~2"
+set "programme_source=%~3"
+
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de %programme_name%
+echo.
+
+:: Initialiser la barre de progression
+set "progress=0"
+
+:: Créer un fichier PowerShell temporaire pour l'installation
+echo $ErrorActionPreference = 'Stop' > "%TEMP%\install_script.ps1"
+echo try { >> "%TEMP%\install_script.ps1"
+if "%programme_source%"=="winget" (
+    echo     winget install %programme_id% --silent --accept-source-agreements --accept-package-agreements >> "%TEMP%\install_script.ps1"
+) else if "%programme_source%"=="choco" (
+    echo     choco install %programme_id% -y >> "%TEMP%\install_script.ps1"
+)
+echo     Write-Host "Installation completed successfully" >> "%TEMP%\install_script.ps1"
+echo } catch { >> "%TEMP%\install_script.ps1"
+echo     Write-Host "Error: $($_.Exception.Message)" >> "%TEMP%\install_script.ps1"
+echo     exit 1 >> "%TEMP%\install_script.ps1"
+echo } >> "%TEMP%\install_script.ps1"
+
+:: Exécuter le script PowerShell
+powershell -NoProfile -ExecutionPolicy Bypass -File "%TEMP%\install_script.ps1" > "%TEMP%\install_output.txt" 2>&1
+
+:: Afficher une barre de progression simulée
+for /l %%i in (0,10,100) do (
+    cls
+    echo %ligne1%
+    echo %ligne2%
+    echo %ligne3%
+    echo.
+    echo ■ Installation de %programme_name%
+    echo.
+    call :draw_progress_bar %%i
+    timeout /t 1 >nul
+)
+
+:: Vérifier le résultat de l'installation
+findstr /C:"Installation completed successfully" "%TEMP%\install_output.txt" >nul
+if %errorlevel% equ 0 (
+    cls
+    echo %ligne1%
+    echo %ligne2%
+    echo %ligne3%
+    echo.
+    echo ■ Installation de %programme_name%
+    echo.
+    call :draw_progress_bar 100
+    echo.
+    echo ► Installation de %programme_name% réussie
+) else (
+    cls
+    echo %ligne1%
+    echo %ligne2%
+    echo %ligne3%
+    echo.
+    echo ■ Installation de %programme_name%
+    echo.
+    call :draw_progress_bar 100
+    echo.
+    echo x Échec de l'installation de %programme_name%
+    type "%TEMP%\install_output.txt"
+)
+
+:: Nettoyer les fichiers temporaires
+del "%TEMP%\install_script.ps1" 2>nul
+del "%TEMP%\install_output.txt" 2>nul
+
+goto :eof
+
+:draw_progress_bar
+setlocal enabledelayedexpansion
+set /a filled=(%1+1)/3
+set "bar=□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□"
+set "fillbar=■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■"
+set "progress_bar=!fillbar:~0,%filled%!!bar:~%filled%!"
+echo [!progress_bar!] %1%%
+endlocal
+goto :eof
 
 :install_all_programs
 cls
@@ -634,350 +687,6 @@ if exist "C:\Windows\Blank.ico" (
     set "shellIconValue=C:\\Windows\\Blank.ico,0"
 ) else (
     set "shellIconValue=%windir%\\System32\\imageres.dll,-17"
-)
-
-(
-echo Windows Registry Editor Version 5.00
-echo.
-echo ;Dark Mode
-echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
-echo "AppsUseLightTheme"=dword:00000000
-echo "SystemUsesLightTheme"=dword:00000000
-echo "EnableTransparency"=dword:00000001
-echo.
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\History]
-echo "AutoColor"=dword:00000001
-echo.
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes]
-echo "CurrentTheme"="C:\\WINDOWS\\resources\\Themes\\dark.theme"
-echo.
-echo ;Visible Places
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start]
-echo "VisiblePlaces"=hex:86,08,73,52,aa,51,43,42,9f,7b,27,76,58,46,59,d4
-echo.
-echo ;SearchboxTaskbarMode
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
-echo "SearchboxTaskbarMode"=dword:00000000
-echo.
-echo ;ShowTaskViewButton
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-echo "ShowTaskViewButton"=dword:00000000
-echo.
-echo ;Set Explore This PC
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-echo "LaunchTo"=dword:00000001
-echo.
-echo ;Compact Mode 
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-echo "UseCompactMode"=dword:00000001
-echo.
-echo ;Menu animation
-echo [HKEY_CURRENT_USER\Control Panel\Desktop]
-echo "MenuShowDelay"="50"
-echo.
-echo ;Wallpaper Quality Max
-echo "JPEGImportQuality"=dword:00000064
-echo.
-echo ;Shortcut
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
-echo "link"=hex:00,00,00,00
-echo.
-echo ;Shell Icon
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Shell Icons]
-echo "29"="!shellIconValue!"
-echo.
-
-echo ;Show Copy More Details
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\OperationStatusManager]
-echo "EnthusiastMode"=dword:00000001
-echo.
-
-echo ;Start
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
-echo "HideRecentlyAddedApps"=dword:00000001
-echo "ShowOrHideMostUsedApps"=dword:00000002
-echo.
-
-echo ;No Recent Docs History
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
-echo "NoRecentDocsHistory"=dword:00000001
-echo.
-
-echo ;Start_TrackDocs
-echo [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-echo "Start_TrackDocs"=dword:00000000
-echo.
-
-echo ;Disable Subscribed Content
-echo [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
-echo "SubscribedContent-338388Enabled"=dword:00000000
-echo.
-
-echo ;Offline Maps
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Maps]
-echo "AutoDownloadAndUpdateMapData"=dword:00000000
-echo.
-
-echo ;Disable Edge Desktop Icon
-echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer]
-echo "DisableEdgeDesktopShortcutCreation"=dword:00000001
-echo.
-
-echo ;Mouse acceleration
-echo [HKEY_CURRENT_USER\Control Panel\Mouse]
-echo "MouseSpeed"="1"
-echo "MouseThreshold1"="6"
-echo "MouseThreshold2"="10"
-) > "%TEMP%\Windows_Settings.reg"
-
-regedit /s "%TEMP%\Windows_Settings.reg"
-del "%TEMP%\Windows_Settings.reg"
-
-taskkill /F /IM explorer.exe
-start explorer.exe
-goto :main_menu
-
-:install_microsoft_store
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Microsoft Store
-echo.
-
-powershell -Command "if (Get-AppxPackage Microsoft.WindowsStore) { exit 0 } else { exit 1 }" >nul 2>&1
-if %errorlevel% equ 0 (
-    echo x Microsoft Store est déjà installé
-    echo.
-    pause
-    goto :main_menu 
-) else (
-    set "tempFolder=%TEMP%\MicrosoftStoreInstall"
-    mkdir "%tempFolder%" 2>nul
-
-    echo - Tlchargement des fichiers ncessaires
-    start /wait bitsadmin /transfer MicrosoftStoreDownload /dynamic /priority high ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.WindowsStore_8wekyb3d8bbwe.msixbundle "%tempFolder%\WindowsStore.msixbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Framework.x64.2.2.appx "%tempFolder%\Framework6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.NET.Native.Runtime.x64.2.2.appx "%tempFolder%\Runtime6X64.appx" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.appxbundle "%tempFolder%\StorePurchaseApp.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.appxbundle "%tempFolder%\XboxIdentityProvider.appxbundle" ^
-        https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/LTSC-Add-MicrosoftStore-24H2/Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml "%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml"
-
-    echo - Installation de Microsoft Store et ses composants
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\WindowsStore.msixbundle' -DependencyPackagePath '%tempFolder%\Framework6X64.appx','%tempFolder%\Runtime6X64.appx' -LicensePath '%tempFolder%\Microsoft.WindowsStore_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Framework6X64.appx' -ErrorAction SilentlyContinue | Out-Null"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\Runtime6X64.appx' -ErrorAction SilentlyContinue | Out-Null"
-    powershell -Command "Add-AppxPackage -Path '%tempFolder%\WindowsStore.msixbundle' -ErrorAction SilentlyContinue | Out-Null"
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\StorePurchaseApp.appxbundle' -LicensePath '%tempFolder%\Microsoft.StorePurchaseApp_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
-    powershell -Command "Add-AppxProvisionedPackage -Online -PackagePath '%tempFolder%\XboxIdentityProvider.appxbundle' -LicensePath '%tempFolder%\Microsoft.XboxIdentityProvider_8wekyb3d8bbwe.xml' -ErrorAction SilentlyContinue | Out-Null"
-
-    rmdir /s /q "%tempFolder%" 2>nul
-
-    echo.
-    echo ► Microsoft Store installé avec succès
-    echo.
-    pause
-    goto :main_menu
-)
-
-:install_microsoft_office
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Installation de Microsoft Office
-echo.
-
-set "tempFolder=%TEMP%\MicrosoftOfficeInstall"
-mkdir "%tempFolder%" 2>nul
-
-echo - Téléchargement de Microsoft Office
-start /wait bitsadmin /transfer OfficeSetupDownload /dynamic /priority high ^
-    "https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365ProPlusRetail&platform=x64&language=fr-fr&version=O16GA" ^
-    "%tempFolder%\OfficeSetup.exe"
-
-if %errorlevel% equ 0 (
-    echo - Installation de Microsoft Office
-    start /wait "" "%tempFolder%\OfficeSetup.exe"
-    if %errorlevel% equ 0 (
-        echo.
-        echo ► Microsoft Office installé avec succès
-    ) else (    
-        echo.
-        echo x Échec de l'installation de Microsoft Office
-    )
-) else (
-    echo.
-    echo x Échec du téléchargement de Microsoft Office
-)
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%tempFolder%" 2>nul
-
-echo.
-pause
-goto :main_menu
-
-:wallpaper_dl
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Téléchargement et installation du fond d'écran
-echo.
-
-set "tempFolder=%TEMP%\WallpaperDownload"
-set "extractFolder=C:\Users\%username%\Pictures\Wallpapers"
-mkdir "%tempFolder%" 2>nul
-mkdir "%extractFolder%" 2>nul
-
-echo - Téléchargement du fond d'écran
-start /wait bitsadmin /transfer WallpaperDownload /dynamic /priority high ^
-    "https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/Wallpaper.zip" ^
-    "%tempFolder%\Wallpaper.zip"
-
-if %errorlevel% equ 0 (
-    echo - Extraction du fond d'écran
-    powershell -Command "Expand-Archive -Path '%tempFolder%\Wallpaper.zip' -DestinationPath '%extractFolder%' -Force"
-    if %errorlevel% equ 0 (
-        echo - Configuration du fond dcran
-        reg add "HKEY_CURRENT_USER\Control Panel\Desktop" /v WallPaper /t REG_SZ /d "C:\Users\%username%\Pictures\Wallpapers\purple.png" /f
-        if %errorlevel% equ 0 (
-            echo ► Fond d'écran installé avec succès
-        ) else (     
-            echo x Échec de la configuration du fond d'écran
-        )
-    ) else (
-        echo x Échec de l'extraction du fond d'écran
-    )
-) else (
-    echo x Échec du téléchargement du fond d'écran
-)
-
-echo - Nettoyage des fichiers temporaires
-rmdir /s /q "%tempFolder%" 2>nul
-
-echo.
-pause
-goto :main_menu
-
-:configure_terminal
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Configuration du Terminal
-echo.
-
-call :install_fonts
-
-call :configure_powershell_profile
-
-call :configure_doskey
-
-call :configure_clink
-
-echo.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$settingsPath = Join-Path $env:LOCALAPPDATA 'Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json'; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/settings.json' -OutFile $settingsPath"
-
-if %errorlevel% equ 0 (
-    echo ► Configuration de Windows Terminal terminée
-) else (
-    echo x Échec de la configuration de Windows Terminal
-)
-
-echo.
-pause
-goto :main_menu
-
-:install_fonts
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$fontPath = '%userprofile%\AppData\Local\Microsoft\Windows\Fonts\MesloLGLNerdFont-Regular.ttf'; if (-not (Test-Path $fontPath)) { $tempFolder = Join-Path $env:TEMP 'Font'; $fontUrl = 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/MesloLGLNerdFont.zip'; $fontZip = Join-Path $tempFolder 'MesloLGLNerdFont.zip'; $extractFolder = Join-Path $tempFolder 'MesloLGLNerdFont'; New-Item -ItemType Directory -Force -Path $tempFolder | Out-Null; New-Item -ItemType Directory -Force -Path $extractFolder | Out-Null; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip; if (Test-Path $fontZip) { Expand-Archive -Path $fontZip -DestinationPath $extractFolder -Force; Get-ChildItem -Path $extractFolder -Filter '*.ttf' | ForEach-Object { $fontName = $_.Name; $fontPath = $_.FullName; $shell = New-Object -ComObject Shell.Application; $destination = $shell.Namespace(0x14); $destination.CopyHere($fontPath, 0x10) }; Remove-Item -Path $extractFolder -Recurse -Force; Write-Host '► Police Meslo LGL Nerd installée avec succès' } else { Write-Host 'x Échec du téléchargement des polices' } } else { Write-Host '► La police Meslo LGL Nerd est déjà installée' }"
-goto :eof
-
-:configure_powershell_profile
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module -Name Terminal-Icons -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSReadLine -Force -SkipPublisherCheck -AllowClobber; Install-Module -Name Z -Scope CurrentUser -Force -AllowClobber; Install-Module posh-git -Scope CurrentUser -Force -AllowClobber; Install-Module -Name PSFzf -Scope CurrentUser -Force -AllowClobber }"
-
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$profileFile = Join-Path $env:USERPROFILE 'Documents\PowerShell\Microsoft.PowerShell_profile.ps1'; $profilePath = Split-Path $profileFile; if (-not (Test-Path $profilePath)) { New-Item -ItemType Directory -Path $profilePath -Force | Out-Null }; Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/PowerShell/Microsoft.PowerShell_profile.ps1' -OutFile $profileFile"
-
-if %errorlevel% equ 0 (
-    echo - Profil PowerShell configuré
-) else (
-    echo x Échec de la configuration du profil PowerShell
-)
-
-winget install fzf --accept-source-agreements --accept-package-agreements >nul 2>&1
-
-goto :eof
-
-:configure_doskey
-if not exist "%userprofile%\.config\doskey" mkdir "%userprofile%\.config\doskey"
-
-powershell -Command "& { Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/GiGiDKR/OhMyWindows/refs/heads/0.3.0/files/.doskey' -OutFile '%userprofile%\.config\doskey\.doskey' }"
-
-if %errorlevel% equ 0 (
-    reg add "HKLM\SOFTWARE\Microsoft\Command Processor" /v AutoRun /t REG_EXPAND_SZ /d "doskey /listsize=999 /macrofile=%userprofile%\.config\doskey\.doskey" /f >nul 2>&1
-    if %errorlevel% equ 0 (
-        echo - Aias Doskey configurés
-    ) else (
-        echo x Échec de la configuration des alias Doskey
-    )
-) else (
-    echo x Échec du téléchargement des alias Doskey
-)
-goto :eof
-
-:configure_clink
-set "tempFolder=%TEMP%\ClinkInstall"
-set "clinkZip=%tempFolder%\clink.zip"
-set "clinkDestination=%userprofile%\AppData\Local\clink"
-
-mkdir "%tempFolder%" 2>nul
-
-powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/clink.zip' -OutFile '%clinkZip%' }"
-
-if %errorlevel% equ 0 (
-    powershell -Command "& { Expand-Archive -Path '%clinkZip%' -DestinationPath '%clinkDestination%' -Force }"
-    if %errorlevel% equ 0 (
-        rmdir /s /q "%tempFolder%" 2>nul
-        echo - Clink configuré
-    ) else (
-        echo x Échec de la configuration de Clink
-    )
-) else (
-    echo x Échec de la configuration de Clink
-)
-goto :eof
-
-:upgrade_programs
-cls
-echo %ligne1%
-echo %ligne2%
-echo %ligne3%
-echo.
-echo ■ Mise à jour des programmes
-echo.
-
-set /p update_choice=Voulez-vous mettre à jour tous les programmes ? (o/n) 
-
-if /i "%update_choice%"=="o" (
-    echo.
-    echo - Mise à jour des programmes Winget
-    winget upgrade --all
-    echo.
-    echo - Mise à jour des programmes Chocolatey
-    choco upgrade all -y
-    echo.
-    echo ► Mises à jour terminées
-) else (
-    echo.
-    echo x Mises à jour annulées
 )
 
 echo.
@@ -1080,7 +789,7 @@ set "scrcpyDestination=C:\Android\scrcpy"
 mkdir "%tempFolder%" 2>nul
 mkdir "C:\Android" 2>nul
 
-powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%'; $asset = $latestRelease.assets | Where-Object { $_.name -like 'scrcpy-win64-v*.zip' } | Select-Object -First 1; if ($asset) { if (Test-Path '%scrcpyDestination%') { Write-Host '► Scrcpy est déjà installé' } else { Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%scrcpyZip%'; if (Test-Path '%scrcpyZip%') { Expand-Archive -Path '%scrcpyZip%' -DestinationPath '%tempFolder%' -Force; $extractedFolder = Get-ChildItem -Path '%tempFolder%' -Directory | Select-Object -First 1; if ($extractedFolder) { Move-Item -Path $extractedFolder.FullName -Destination '%scrcpyDestination%' -Force; Write-Host '► Scrcpy installé avec succès' } else { Write-Host 'x Dossier extrait non trouvé' } } else { Write-Host 'x Échec du téléchargement' } } } else { Write-Host 'x Asset non trouvé' } }"
+powershell -Command "& { $latestRelease = Invoke-RestMethod -Uri '%scrcpyApiUrl%'; $asset = $latestRelease.assets | Where-Object { $_.name -like 'scrcpy-win64-v*.zip' } | Select-Object -First 1; if ($asset) { if (Test-Path '%scrcpyDestination%') { Write-Host '► Scrcpy est déjà installé' } else { Invoke-WebRequest -Uri $asset.browser_download_url -OutFile '%scrcpyZip%'; if (Test-Path '%scrcpyZip%') { Expand-Archive -Path '%scrcpyZip%' -DestinationPath '%tempFolder%' -Force; $extractedFolder = Get-ChildItem -Path '%tempFolder%' -Directory | Select-Object -First 1; if ($extractedFolder) { Move-Item -Path $extractedFolder.FullName -Destination '%scrcpyDestination%' -Force; Write-Host '► Scrcpy installé avec succès' } else { Write-Host 'x Dossier extrait non trouvé' } } else { Write-Host 'x Échec du tléchargement' } } } else { Write-Host 'x Asset non trouvé' } }"
 
 if exist "%scrcpyDestination%" (
     setx PATH "%PATH%;%scrcpyDestination%" /M >nul 2>&1
@@ -1103,8 +812,7 @@ if exist "%scrcpyDestination%" (
 
 rmdir /s /q "%tempFolder%" 2>nul
 echo.
-pause
-goto :android_tools
+goto :eof
 
 :install_odin3
 cls
@@ -1158,8 +866,7 @@ if %errorlevel% equ 0 (
 
 rmdir /s /q "%tempFolder%" 2>nul
 echo.
-pause
-goto :android_tools
+goto :eof
 
 :install_samfwtool
 cls
@@ -1187,8 +894,7 @@ if %errorlevel% equ 0 (
 
 rmdir /s /q "%tempFolder%" 2>nul
 echo.
-pause
-goto :android_tools
+goto :eof
 
 :install_pixel_flasher
 cls
@@ -1232,8 +938,7 @@ if %errorlevel% equ 0 (
 )
 
 echo.
-pause
-goto :android_tools
+goto :eof
 
 :configure_programs
 cls
