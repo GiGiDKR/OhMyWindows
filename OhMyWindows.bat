@@ -79,7 +79,7 @@ echo %ligne1%
 echo %ligne2%
 echo %ligne3%
 echo.
-echo Installation des gestionnaires de paquets
+echo ■ Installation des gestionnaires de paquets
 echo.
 
 echo - Installation de Winget
@@ -124,7 +124,7 @@ if %errorlevel% equ 0 (
     choco --version
 ) else (
     echo.
-    echo x Ã‰chec de l'installation de Chocolatey
+    echo  x Échec de l'installation de Chocolatey
 )
 
 echo.
@@ -560,7 +560,7 @@ for %%i in (%choix%) do (
         )
     ) else (
         echo.
-        echo x Le programme numÃ©ro %%i n'existe pas dans la liste.
+        echo x Le programme numéro %%i n'existe pas dans la liste.
     )
 )
 
