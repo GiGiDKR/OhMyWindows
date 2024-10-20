@@ -103,7 +103,6 @@ rmdir /s /q "%tempFolder%" >nul 2>&1
 
 echo.
 echo ► Installation de Winget terminée !
-call :version_winget
 
 echo.
 echo - Installation de Chocolatey
@@ -121,7 +120,7 @@ if %errorlevel% equ 0 (
 
 echo.
 pause
-goto :install_windows_terminal
+goto :main_menu
 
 :install_windows_terminal
 cls
@@ -177,7 +176,7 @@ echo %ligne1%
 echo.
 set /p choix=■ Sélectionner une option : 
 
-if "%choix%"=="1" goto :install_programmes
+if "%choix%"=="1" goto :
 if "%choix%"=="2" goto :install_microsoft_store
 if "%choix%"=="3" goto :install_microsoft_office
 if "%choix%"=="4" goto :windows_features
@@ -570,7 +569,7 @@ echo %ligne2%
 echo %ligne3%
 echo.
 echo ■ Installation de tous les programmes
-powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de ' $name; if ($source -eq 'winget') { $result = winget install $id --silent --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -eq 0) { Write-Host 'â–º Installation de ' $name ' rÃ©ussie' } elseif ($LASTEXITCODE -eq -1978335189) { Write-Host 'â–º La derniÃ¨re version de ' $name ' est dÃ©jÃ  installÃ©e' } else { Write-Host 'x Ã‰chec de l''installation de ' $name } } elseif ($source -eq 'choco') { $result = choco install $id -y -f; if ($LASTEXITCODE -eq 0) { Write-Host 'â–º Installation de ' $name ' rÃ©ussie' } elseif ($LASTEXITCODE -eq 3010) { Write-Host 'â–º La derniÃ¨re version de ' $name ' est dÃ©jÃ  installÃ©e' } else { Write-Host 'x Ã‰chec de l''installation de ' $name } } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour ' $name } }"
+powershell -Command "Get-Content '%ORIGINAL_PATH%packages.json' | ConvertFrom-Json | Select-Object -ExpandProperty packages | ForEach-Object { $name = $_.name; $id = $_.id; $source = $_.source; Write-Host ''; Write-Host '- Installation de '$name; if ($source -eq 'winget') { $result = winget install $id --silent --accept-source-agreements --accept-package-agreements; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de '$name' réussie' } elseif ($LASTEXITCODE -eq -1978335189) { Write-Host '- La dernière version de '$name' est déjà installée' } else { Write-Host 'x Échec de l'installation de '$name } } elseif ($source -eq 'choco') { $result = choco install $id -y -f; if ($LASTEXITCODE -eq 0) { Write-Host '► Installation de '$name' réussie' } elseif ($LASTEXITCODE -eq 3010) { Write-Host '- La dernière version de '$name' est déjà installée' } else { Write-Host 'x Échec de l'installation de '$name } } elseif ($source -eq 'exe') { & cmd /c call :install_custom_exe '$name' '$id' } elseif ($source -eq 'zip') { & cmd /c call :install_custom_archive '$name' '$id' } else { Write-Host 'Source inconnue pour '$name } }"
 
 echo.
 pause
