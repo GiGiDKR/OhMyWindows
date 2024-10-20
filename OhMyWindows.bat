@@ -52,7 +52,6 @@ echo.
 where winget >nul 2>&1
 if %errorlevel% equ 0 (
     for /f "tokens=*" %%i in ('winget -v') do set "winget_version=%%i"
-    echo â–º Version de Winget : %winget_version%
     goto :check_windows_terminal
 ) else (
     echo x Winget n'est pas installé sur votre système
@@ -61,16 +60,8 @@ if %errorlevel% equ 0 (
 
 :check_windows_terminal
 if "%WT_SESSION%"=="" (
-    where wt.exe >nul 2>&1
-    if %errorlevel% equ 0 (
-        echo Windows Terminal est déjà installé
-        echo Redémarrage du script dans Windows Terminal
-        start wt "%~dpnx0"
-        exit /b
-    ) else (
-        echo Windows Terminal n'est pas installé
-        goto :install_windows_terminal
-    )
+    echo - Installation de Windows Terminal
+    goto :install_windows_terminal
 )
 goto :main_menu
 
@@ -140,10 +131,10 @@ echo %ligne3%
 echo.
 echo ■ Installation de Windows Terminal
 echo.
-winget install Microsoft.WindowsTerminal --accept-source-agreements --accept-package-agreements
+winget install Microsoft.WindowsTerminal --accept-source-agreements --accept-package-agreements >nul 2>&1
 if %errorlevel% equ 0 (
     echo.
-    echo ► Windows Terminal a été installé avec succès !
+    echo ► Windows Terminal installé
     echo.
     echo Redémarrage du script dans Windows Terminal
     timeout /t 2 >nul
