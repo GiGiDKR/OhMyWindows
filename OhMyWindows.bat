@@ -1380,6 +1380,7 @@ echo.
 echo ■ Menu des thèmes
 echo.
 echo 1 - ExplorerBlurMica
+echo 2 - macOS Purple
 echo.
 echo 0 - Retour au menu principal
 echo.
@@ -1387,6 +1388,7 @@ set /p theme_choice=■ Sélectionner une option :
 
 if "%theme_choice%"=="0" goto :main_menu
 if "%theme_choice%"=="1" goto :install_explorerblurmica
+if "%theme_choice%"=="2" goto :install_macos_purple
 
 echo.
 echo Option invalide. Veuillez réessayer.
@@ -1480,6 +1482,36 @@ if %errorlevel% equ 0 (
 )
 
 rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :theme_menu
+
+:install_macos_purple
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation du thème macOS Purple
+echo.
+
+set "themeUrl=https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/Theme/macOS%%20Purple/macOS%%20Purple.theme"
+set "themeDestination=%LOCALAPPDATA%\Microsoft\Windows\Themes\macOS Purple.theme"
+
+powershell -Command "& { Invoke-WebRequest -Uri '%themeUrl%' -OutFile '%themeDestination%' }"
+
+if %errorlevel% equ 0 (
+    echo ► Thème macOS Purple téléchargé
+    start "" "%themeDestination%"
+    if %errorlevel% equ 0 (
+        echo ► Thème macOS Purple appliqué
+    ) else (
+        echo x Échec de l'application du thème
+    )
+) else (
+    echo x Échec du téléchargement du thème
+)
+
 echo.
 pause
 goto :theme_menu
