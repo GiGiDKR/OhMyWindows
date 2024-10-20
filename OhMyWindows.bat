@@ -61,13 +61,14 @@ if %errorlevel% equ 0 (
 
 :check_windows_terminal
 if "%WT_SESSION%"=="" (
-    where wt >nul 2>&1
+    where wt.exe >nul 2>&1
     if %errorlevel% equ 0 (
         echo Windows Terminal est déjà installé
         echo Redémarrage du script dans Windows Terminal
         start wt "%~dpnx0"
         exit /b
     ) else (
+        echo Windows Terminal n'est pas installé
         goto :install_windows_terminal
     )
 )
