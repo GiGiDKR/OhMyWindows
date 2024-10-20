@@ -1,0 +1,140 @@
+; Copyright © VIN STAR.
+
+[Theme]
+; Windows - IDS_THEME_DISPLAYNAME_macOS Sequoia Dark 
+DisplayName=MyOSXTheme
+ThemeId={BA9079A0-3A26-496E-83C6-5680131C6A9E}
+
+; Computer - SHIDI_SERVER
+[CLSID\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\DefaultIcon]
+DefaultValue=%SystemRoot%\System32\imageres.dll,-109
+
+; UsersFiles - SHIDI_USERFILES
+[CLSID\{59031A47-3F72-44A7-89C5-5595FE6B30EE}\DefaultIcon]
+DefaultValue=%SystemRoot%\System32\imageres.dll,-123
+
+; Network - SHIDI_MYNETWORK
+[CLSID\{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}\DefaultIcon]
+DefaultValue=%SystemRoot%\System32\imageres.dll,-25
+
+; Recycle Bin - SHIDI_RECYCLERFULL SHIDI_RECYCLER
+[CLSID\{645FF040-5081-101B-9F08-00AA002F954E}\DefaultIcon]
+Full=%SystemRoot%\System32\imageres.dll,-54
+Empty=%SystemRoot%\System32\imageres.dll,-55
+
+[Control Panel\Cursors]
+AppStarting=%SystemRoot%\Cursors\macOS Sequoia\working.ani
+Arrow=%SystemRoot%\Cursors\macOS Sequoia\arrow.cur
+Crosshair=%SystemRoot%\Cursors\macOS Sequoia\cross.cur
+Hand=%SystemRoot%\Cursors\macOS Sequoia\link.cur
+Help=%SystemRoot%\Cursors\macOS Sequoia\helpsel.cur
+IBeam=%SystemRoot%\Cursors\macOS Sequoia\text.cur
+No=%SystemRoot%\Cursors\macOS Sequoia\unavail.cur
+NWPen=%SystemRoot%\Cursors\macOS Sequoia\pen.cur
+SizeAll=%SystemRoot%\Cursors\macOS Sequoia\move.cur
+SizeNESW=%SystemRoot%\Cursors\macOS Sequoia\nesw.cur
+SizeNS=%SystemRoot%\Cursors\macOS Sequoia\ns.cur
+SizeNWSE=%SystemRoot%\Cursors\macOS Sequoia\nwse.cur
+SizeWE=%SystemRoot%\Cursors\macOS Sequoia\ew.cur
+UpArrow=%SystemRoot%\Cursors\macOS Sequoia\arrow_i.cur
+Wait=%SystemRoot%\Cursors\macOS Sequoia\busy.ani
+DefaultValue=macOS Sequoia
+
+[Control Panel\Desktop]
+Wallpaper=%USERPROFILE%\pictures\diaporama\purple.png
+Pattern=
+MultimonBackgrounds=0
+PicturePosition=4
+WallpaperWriteTime=133497116810978981
+WindowsSpotlight=0
+
+[VisualStyles]
+Path=%SystemRoot%\resources\Themes\macOS Sequoia\macOS D.msstyles
+ColorStyle=NormalColor
+Size=NormalSize
+AutoColorization=1
+SystemMode=Dark
+AppMode=Dark
+ColorizationColor=0X2E1B5A
+VisualStyleVersion=10
+
+[boot]
+SCRNSAVE.EXE=
+
+[MasterThemeSelector]
+MTSM=RJSPBS
+
+[Sounds]
+; IDS_SCHEME_DEFAULT
+SchemeName=macOS
+
+[Control Panel\Cursors.A]
+[Control Panel\Cursors.W]
+DefaultValue=Windows par d+AOk-faut
+[Theme.A]
+[Theme.W]
+DisplayName=Th+AOg-me non enregistr+AOk-
+[AppEvents\Schemes\Apps\.Default\.Default]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Default Beep.wav
+[AppEvents\Schemes\Apps\.Default\AppGPFault]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Program Error.wav
+[AppEvents\Schemes\Apps\.Default\CCSelect]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Select.wav
+[AppEvents\Schemes\Apps\.Default\ChangeTheme]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Logon.wav
+[AppEvents\Schemes\Apps\.Default\Close]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Close.wav
+[AppEvents\Schemes\Apps\.Default\CriticalBatteryAlarm]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Critical Battery.wav
+[AppEvents\Schemes\Apps\.Default\DeviceConnect]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Device Connect.wav
+[AppEvents\Schemes\Apps\.Default\DeviceDisconnect]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Device Disconnect.wav
+[AppEvents\Schemes\Apps\.Default\DeviceFail]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Device Failed.wav
+[AppEvents\Schemes\Apps\.Default\FaxBeep]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\New Mail.wav
+[AppEvents\Schemes\Apps\.Default\LowBatteryAlarm]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Low Battery.wav
+[AppEvents\Schemes\Apps\.Default\MailBeep]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\New Mail.wav
+[AppEvents\Schemes\Apps\.Default\Maximize]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Maximize.wav
+[AppEvents\Schemes\Apps\.Default\MenuCommand]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Menu Command.wav
+[AppEvents\Schemes\Apps\.Default\MenuPopup]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Menu Popup.wav
+[AppEvents\Schemes\Apps\.Default\Minimize]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Minimize.wav
+[AppEvents\Schemes\Apps\.Default\PrintComplete]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Print Complete.wav
+[AppEvents\Schemes\Apps\.Default\RestoreDown]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Restore Down.wav
+[AppEvents\Schemes\Apps\.Default\RestoreUp]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Restore Up.wav
+[AppEvents\Schemes\Apps\.Default\SystemAsterisk]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Asterik.wav
+[AppEvents\Schemes\Apps\.Default\SystemExclamation]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Exclamation.wav
+[AppEvents\Schemes\Apps\.Default\SystemHand]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Critical Stop.wav
+[AppEvents\Schemes\Apps\.Default\SystemNotification]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\System Notifi.wav
+[AppEvents\Schemes\Apps\.Default\SystemQuestion]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Question.wav
+[AppEvents\Schemes\Apps\.Default\WindowsUAC]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Contact Online.wav
+[AppEvents\Schemes\Apps\Explorer\ActivatingDocument]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Complete Navigation.wav
+[AppEvents\Schemes\Apps\Explorer\BlockedPopup]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Menu Popup.wav
+[AppEvents\Schemes\Apps\Explorer\EmptyRecycleBin]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Empty Recycle.wav
+[AppEvents\Schemes\Apps\Explorer\FeedDiscovered]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Person Leave.wav
+[AppEvents\Schemes\Apps\Explorer\MoveMenuItem]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Move Menu.wav
+[AppEvents\Schemes\Apps\Explorer\Navigating]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\Start Navigation.wav
+[AppEvents\Schemes\Apps\Explorer\SecurityBand]
+DefaultValue=%SystemRoot%\Resources\Themes\macOS Sequoia\Sound Scheme\New Alert.wav
