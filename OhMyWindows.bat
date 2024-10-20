@@ -176,6 +176,7 @@ echo 9 - Configuration Terminal
 echo 10 - Configuration programmes
 echo 11 - Mise à jour programmes
 echo 12 - Outils Android
+echo 13 - Thème
 
 echo.
 echo 0 - Quitter
@@ -196,6 +197,8 @@ if "%choix%"=="9" goto :configure_terminal
 if "%choix%"=="10" goto :configure_programs
 if "%choix%"=="11" goto :update_programs
 if "%choix%"=="12" goto :android_tools
+if "%choix%"=="13" goto :theme_menu
+
 if "%choix%"=="0" goto :end_of_script
 
 echo.
@@ -1367,6 +1370,119 @@ del "%temp_reg%" 2>nul
 echo.
 pause
 goto :configure_programs
+
+:theme_menu
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Menu des thèmes
+echo.
+echo 1 - ExplorerBlurMica
+echo.
+echo 0 - Retour au menu principal
+echo.
+set /p theme_choice=■ Sélectionner une option : 
+
+if "%theme_choice%"=="0" goto :main_menu
+if "%theme_choice%"=="1" goto :install_explorerblurmica
+
+echo.
+echo Option invalide. Veuillez réessayer.
+pause
+goto :theme_menu
+
+:install_explorerblurmica
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Installation de ExplorerBlurMica
+echo.
+
+set "tempFolder=%TEMP%\ExplorerBlurMica"
+set "installFolder=C:\Program Files\ExplorerBlurMica"
+mkdir "%tempFolder%" 2>nul
+mkdir "%installFolder%" 2>nul
+
+if not exist "%installFolder%\ExplorerBlurMica.dll" (
+    echo - Téléchargement de Explorer Blur Mica
+    powershell -Command "& { Invoke-WebRequest -Uri 'https://github.com/GiGiDKR/OhMyWindows/raw/refs/heads/0.3.0/files/Theme/ExplorerBlurMica.zip' -OutFile '%tempFolder%\ExplorerBlurMica.zip' }"
+
+    if %errorlevel% equ 0 (
+        echo - Extraction de l'archive
+        powershell -Command "& { Expand-Archive -Path '%tempFolder%\ExplorerBlurMica.zip' -DestinationPath '%installFolder%' -Force }"
+        
+        if %errorlevel% equ 0 (
+            echo - Installation de Explorer Blur Mica
+            regsvr32 /s "%installFolder%\ExplorerBlurMica.dll"
+            
+            if %errorlevel% neq 0 (
+                echo x Échec de l'installation de Explorer Blur Mica
+                pause
+                goto :theme_menu
+            )
+        ) else (
+            echo x Échec de l'extraction de l'archive
+            pause
+            goto :theme_menu
+        )
+    ) else (
+        echo x Échec du téléchargement de Explorer Blur Mica
+        pause
+        goto :theme_menu
+    )
+)
+
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+echo ■ Configuration de ExplorerBlurMica
+echo.
+echo 1 - Acrylic (par défaut)
+echo 2 - Mica
+echo 3 - Clear
+echo 4 - MicaAlt
+echo.
+set /p effect_choice=■ Sélectionner un effet : 
+
+if "%effect_choice%"=="1" set "effect=1"
+if "%effect_choice%"=="2" set "effect=2"
+if "%effect_choice%"=="3" set "effect=3"
+if "%effect_choice%"=="4" set "effect=4"
+
+if not defined effect (
+    echo Option invalide. Retour au menu des thèmes.
+    pause
+    goto :theme_menu
+)
+
+powershell -Command "& { (Get-Content '%installFolder%\config.ini') -replace 'effect=.*', 'effect=%effect%' | Set-Content '%installFolder%\config.ini' }"
+
+cls
+echo %ligne1%
+echo %ligne2%
+echo %ligne3%
+echo.
+
+if %errorlevel% equ 0 (
+    echo ► Configuration mise à jour
+    echo ► Redémarrage de l'explorateur
+    taskkill /F /IM explorer.exe >nul 2>&1
+    start explorer.exe >nul 2>&1
+    start /wait explorer.exe >nul 2>&1
+) else (
+    echo x Échec de la configuration
+)
+
+rmdir /s /q "%tempFolder%" 2>nul
+echo.
+pause
+goto :theme_menu
 
 :end_of_script
 cls
