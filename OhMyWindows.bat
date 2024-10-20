@@ -176,7 +176,7 @@ echo %ligne1%
 echo.
 set /p choix=■ Sélectionner une option : 
 
-if "%choix%"=="1" goto :
+if "%choix%"=="1" goto :install_programs
 if "%choix%"=="2" goto :install_microsoft_store
 if "%choix%"=="3" goto :install_microsoft_office
 if "%choix%"=="4" goto :windows_features
