@@ -81,9 +81,12 @@ if not exist "%tempFolder%" mkdir "%tempFolder%" >nul 2>&1
 echo - Téléchargement des fichiers nécessaires
 start /wait bitsadmin /transfer WinGetDownload /dynamic /priority high ^
     https://aka.ms/getwinget "%tempFolder%\winget.msixbundle" ^
-    https://aka.ms/Microsoft.VCLibs.x86.14.00.Desktop.appx "%tempFolder%\vclibs_x86.appx" ^
+    ::https://github.com/microsoft/winget-cli/releases/latest/download/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle "%tempFolder%\desktopappinstaller.msixbundle" ^
+    ::https://aka.ms/Microsoft.VCLibs.x86.14.00.Desktop.appx "%tempFolder%\vclibs_x86.appx" ^
     https://aka.ms/Microsoft.VCLibs.x64.14.00.Desktop.appx "%tempFolder%\vclibs_x64.appx" ^
-    https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.7.3 "%tempFolder%\xaml.zip" >nul 2>&1
+    ::https://download.microsoft.com/download/4/7/c/47c6134b-d61f-4024-83bd-b9c9ea951c25/Microsoft.VCLibs.x64.14.00.Desktop.appx "%tempFolder%\vclibs_x64.appx" ^
+    https://www.nuget.org/api/v2/package/Microsoft.UI.Xaml/2.8.6 "%tempFolder%\xaml.zip" >nul 2>&1
+    ::https://github.com/microsoft/microsoft-ui-xaml/releases/download/v2.8.6/Microsoft.UI.Xaml.2.8.x64.appx "%tempFolder%\xaml_x64.appx" >nul 2>&1
 
 echo - Extraction des fichiers
 powershell -Command "& {Expand-Archive -Path '%tempFolder%\xaml.zip' -DestinationPath '%tempFolder%\xaml'}" >nul 2>&1
@@ -91,7 +94,7 @@ powershell -Command "& {Expand-Archive -Path '%tempFolder%\xaml.zip' -Destinatio
 for /f "delims=" %%i in ('powershell -Command "& {Get-ChildItem -Path '%tempFolder%\xaml' -Recurse -Filter '*.appx' | Where-Object { $_.Name -like '*x64*' } | Select-Object -First 1 -ExpandProperty FullName}" 2^>nul') do set "xamlAppxPath=%%i"
 
 echo - Installation des dépendances
-powershell -Command "& {Add-AppxPackage -Path '%tempFolder%\vclibs_x86.appx'}" >nul 2>&1
+::owershell -Command "& {Add-AppxPackage -Path '%tempFolder%\vclibs_x86.appx'}" >nul 2>&1
 powershell -Command "& {Add-AppxPackage -Path '%tempFolder%\vclibs_x64.appx'}" >nul 2>&1
 if defined xamlAppxPath powershell -Command "& {Add-AppxPackage -Path '!xamlAppxPath!'}" >nul 2>&1
 
